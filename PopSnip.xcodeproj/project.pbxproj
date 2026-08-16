@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		06F33A055376B5B80ECAFD98 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025C61468D3BF670EE3B879B /* DesignTokens.swift */; };
 		07078A58B613ECB9261AFE19 /* AccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B8E2A8FE5177C8CA4754D /* AccessibilityPermission.swift */; };
+		0CA56064650D1B14FF532AC3 /* IMESafeSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */; };
 		0EBADA37A1BB882A15F88890 /* SnippetTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A92085458711C77C7CE771 /* SnippetTag.swift */; };
 		1720783BCFAC93F8972B13ED /* SnippetRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65853605E72D11ED5241B812 /* SnippetRowView.swift */; };
 		1CCB9BFC909E0AAE3D52ACA6 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC43078BE3B62AB664F90E0D /* SnippetStore.swift */; };
@@ -20,6 +21,7 @@
 		3BA7404074E78609F35A802B /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5C8835B5709CBA2F700C9A /* Localization.swift */; };
 		420B59719E8DB8A08B5B3753 /* SnippetLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B736AD617CD07D956DD8A1E /* SnippetLibrary.swift */; };
 		44CA8E429FBFFEFDD333A3A9 /* PanelPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EC31FF0535255EC56CF9BA /* PanelPreferences.swift */; };
+		50F0A3BE475F01D770934FE1 /* SnippetPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */; };
 		5175CF1D7ABCF451A3362027 /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5C31F8B1BB9C9A559A698F /* SettingsTabView.swift */; };
 		51CFCA694E9934B8DD37BF5B /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */; };
 		535763C8305BB1AD15609796 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2409091F46EDE1F841DE459F /* TagManagerView.swift */; };
@@ -82,6 +84,7 @@
 		3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevelopmentTeam.xcconfig; sourceTree = "<group>"; };
 		443CA035B2EBAB6AD3673A25 /* SnippetEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorWindowController.swift; sourceTree = "<group>"; };
 		44E264FD3D6202EAE5ECC7DF /* GlobalShortcutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcutService.swift; sourceTree = "<group>"; };
+		4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMESafeSearchField.swift; sourceTree = "<group>"; };
 		502B8E2A8FE5177C8CA4754D /* AccessibilityPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermission.swift; sourceTree = "<group>"; };
 		54E7BBC98E9C70A7B8926B4A /* SnippetPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanelView.swift; sourceTree = "<group>"; };
 		5F2885602E4D1F75F5BD1871 /* PanelShortcutConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelShortcutConfiguration.swift; sourceTree = "<group>"; };
@@ -114,6 +117,7 @@
 		D4123CD1F304EEA9E671397A /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		D58B10C162E0DF339FA7B586 /* SnippetLibraryCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetLibraryCodableTests.swift; sourceTree = "<group>"; };
 		D86705B4320DA0A0D4BD4EA8 /* PopSnipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopSnipApp.swift; sourceTree = "<group>"; };
+		D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanelViewModel.swift; sourceTree = "<group>"; };
 		D982C51F8228B3ECA4D58150 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		DA5C8835B5709CBA2F700C9A /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		E1613116158D85AB858BF0BC /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
@@ -289,9 +293,11 @@
 		E257F04310F2248337031CD2 /* Panel */ = {
 			isa = PBXGroup;
 			children = (
+				4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */,
 				04814C0409EAAA7AF0CDA6C2 /* SnippetPanel.swift */,
 				9A13E21E55D335BC55A48FDE /* SnippetPanelPresenter.swift */,
 				54E7BBC98E9C70A7B8926B4A /* SnippetPanelView.swift */,
+				D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */,
 				65853605E72D11ED5241B812 /* SnippetRowView.swift */,
 				1620B97F23F35CBA7085E706 /* TagChipView.swift */,
 			);
@@ -362,7 +368,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					4CA15E98B87976149D7A3AF7 = {
 						ProvisioningStyle = Automatic;
@@ -430,6 +436,7 @@
 				C5DDE67FC90C494331E5FF25 /* GeneralSettingsView.swift in Sources */,
 				DC737872A7C980B9F3B52F5E /* GlobalShortcutService.swift in Sources */,
 				57BFE64B3096F0CBFBE14EA8 /* HighlightRange.swift in Sources */,
+				0CA56064650D1B14FF532AC3 /* IMESafeSearchField.swift in Sources */,
 				ED997162CB2C6E468FA33BEF /* InsertionTarget.swift in Sources */,
 				E015D64D532D564AF0B44D65 /* LaunchAtLoginManager.swift in Sources */,
 				3BA7404074E78609F35A802B /* Localization.swift in Sources */,
@@ -454,6 +461,7 @@
 				B9E1138CC7B33207A9503874 /* SnippetPanel.swift in Sources */,
 				AA1198C76291EE679C54F747 /* SnippetPanelPresenter.swift in Sources */,
 				A8C048B2AF46BAD004C21CF3 /* SnippetPanelView.swift in Sources */,
+				50F0A3BE475F01D770934FE1 /* SnippetPanelViewModel.swift in Sources */,
 				1720783BCFAC93F8972B13ED /* SnippetRowView.swift in Sources */,
 				5F5DE97F9AA825D59B4F47A7 /* SnippetSearchEngine.swift in Sources */,
 				1CCB9BFC909E0AAE3D52ACA6 /* SnippetStore.swift in Sources */,
@@ -494,6 +502,7 @@
 			baseConfigurationReference = 3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -527,10 +536,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = UAC4B833KN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -553,6 +565,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -565,6 +578,7 @@
 			baseConfigurationReference = 3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -598,10 +612,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = UAC4B833KN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -617,6 +634,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -629,6 +647,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -647,6 +666,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -665,9 +685,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;
@@ -679,9 +703,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;

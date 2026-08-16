@@ -17,6 +17,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
     private let store: SnippetStore
 
     private var activePanel: SnippetPanel?
+    private var activeViewModel: SnippetPanelViewModel?
+    private weak var searchField: NSTextField?
     private var keyDownEventMonitor: Any?
     private var currentTarget: InsertionTarget?
     private var isHandlingPanelAction = false
@@ -82,12 +84,21 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         panel.isMovableByWindowBackground = true
         panel.animationBehavior = .utilityWindow
 
-        let panelView = SnippetPanelView(
+        let viewModel = SnippetPanelViewModel(
             store: store,
             preferences: preferences,
             onSelectSnippet: { [weak self] snippet in
                 self?.insertAndClose(snippet)
             },
+            onCancel: { [weak self] in
+                self?.closePanelIfNeeded(animated: true)
+            }
+        )
+        activeViewModel = viewModel
+
+        let panelView = SnippetPanelView(
+            store: store,
+            viewModel: viewModel,
             onOpenEditor: { [weak self] in
                 self?.openEditorAndClose()
             },
@@ -97,8 +108,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             onOpenSettings: { [weak self] in
                 self?.performActionAndClose { self?.onOpenSettings?() }
             },
-            onCancel: { [weak self] in
-                self?.closePanelIfNeeded(animated: true)
+            onSearchFieldCreated: { [weak self] field in
+                self?.searchField = field
             }
         )
         let hostingView = NSHostingView(rootView: panelView)
@@ -117,6 +128,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         activePanel = nil
+        activeViewModel = nil
+        searchField = nil
         removeKeyDownMonitorIfNeeded()
     }
 
@@ -201,7 +214,18 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         }
     }
 
-    // MARK: - キーモニタ（Esc のみここで処理し、それ以外は SwiftUI 側の onKeyPress へ委譲する）
+    // MARK: - キーモニタ
+    //
+    // Esc・上下矢印・Enter・Backspace・⌘1〜⌘9 をここで一元的に処理する。
+    // 当初は上下矢印/Enter/Backspace を IMESafeSearchField 側の NSTextFieldDelegate の
+    // doCommandBy 経由で判定していたが、単一行の NSTextField では field editor が
+    // 上下矢印キーに対して doCommandBy を確実に発火させないケースがあり、検索結果の絞り込み中や
+    // タグドリルダウン中にカーソルキーでの選択移動ができない不具合が残った。
+    // そのため判定をここ（NSEvent ローカルモニタ）へ一本化し、`hasMarkedText` で
+    // IME 変換中かどうかを確認したうえで、変換中は素通し（IME に処理させる）、
+    // そうでなければアプリ側のキー操作として処理する。
+    //
+    // Cmd 修飾キーは IME の変換処理に一切関与しないため、⌘1〜⌘9 は常にここで処理してよい。
 
     private func installKeyDownMonitorIfNeeded() {
         guard keyDownEventMonitor == nil else {
@@ -211,12 +235,50 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             guard let self, let activePanel = self.activePanel, activePanel.isKeyWindow else {
                 return keyEvent
             }
-            guard keyEvent.keyCode == 53 else { // Esc
+
+            if
+                keyEvent.modifierFlags.contains(.command),
+                let character = keyEvent.charactersIgnoringModifiers?.first,
+                let digit = character.wholeNumberValue,
+                (1...9).contains(digit)
+            {
+                self.activeViewModel?.handleKeyEvent(.digit(digit))
+                return nil
+            }
+
+            // IME 変換中（変換候補の選択中など）は、矢印・Enter・Backspace を
+            // 入力システムにそのまま渡す（変換候補の操作を妨げない）。
+            guard self.isComposingWithIME == false else {
                 return keyEvent
             }
-            self.closePanelIfNeeded(animated: true)
-            return nil
+
+            switch keyEvent.keyCode {
+            case 53: // Esc
+                self.closePanelIfNeeded(animated: true)
+                return nil
+            case 126: // 上矢印
+                self.activeViewModel?.handleKeyEvent(.arrowUp)
+                return nil
+            case 125: // 下矢印
+                self.activeViewModel?.handleKeyEvent(.arrowDown)
+                return nil
+            case 36: // Enter / Return
+                self.activeViewModel?.handleKeyEvent(.confirm)
+                return nil
+            case 51: // Backspace（Delete）
+                if self.activeViewModel?.handleBackspaceForDrillDownIfNeeded() == true {
+                    return nil
+                }
+                return keyEvent
+            default:
+                return keyEvent
+            }
         }
+    }
+
+    /// 検索フィールドが現在 IME の変換（マークテキスト）状態かどうか。
+    private var isComposingWithIME: Bool {
+        (searchField?.currentEditor() as? NSTextView)?.hasMarkedText() ?? false
     }
 
     private func removeKeyDownMonitorIfNeeded() {

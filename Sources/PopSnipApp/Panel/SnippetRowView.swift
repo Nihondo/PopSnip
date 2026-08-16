@@ -4,6 +4,21 @@
 
 import SwiftUI
 
+/// 選択中の行のハイライト。`.regularMaterial`（半透明のビビッド背景）の上では
+/// 低opacityの塗りだけだとブレンドでほぼ見えなくなるため、塗り + 縁取りの二重で強調する。
+private extension View {
+    func panelRowHighlight(isSelected: Bool) -> some View {
+        background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(isSelected ? Color.accentColor.opacity(0.32) : Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .strokeBorder(isSelected ? Color.accentColor.opacity(0.7) : Color.clear, lineWidth: 1.2)
+        )
+    }
+}
+
 /// スニペット1件の行。
 struct SnippetRowView: View {
     let snippet: Snippet
@@ -55,10 +70,7 @@ struct SnippetRowView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.clear)
-        )
+        .panelRowHighlight(isSelected: isSelected)
         .contentShape(Rectangle())
     }
 
@@ -117,10 +129,28 @@ struct TagRowView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.clear)
-        )
+        .panelRowHighlight(isSelected: isSelected)
+        .contentShape(Rectangle())
+    }
+}
+
+/// タグドリルダウン中の「< タグ名」行。クリックだけでなくカーソルキーでも選択できる
+/// （一覧の先頭項目として扱われる）。
+struct BackRowView: View {
+    let tag: SnippetTag
+    let isSelected: Bool
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+            TagChipView(tag: tag)
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .panelRowHighlight(isSelected: isSelected)
         .contentShape(Rectangle())
     }
 }

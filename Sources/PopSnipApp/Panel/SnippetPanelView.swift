@@ -2,44 +2,30 @@
 // 検索パネルのメインコンテンツ。PopSnip_UI_plan.md のレイアウトに従う:
 // 検索ボックス → (空欄時: タグ一覧 + 最近使用 / 入力時: 検索結果) → フッター。
 //
-// セクションの描画は PanelPreferences.sectionOrder / enabledSections を ForEach で回し、
-// キー操作は PanelKeyBinding テーブル経由で解決する
+// キー操作・選択状態は SnippetPanelViewModel に集約し、検索ボックスは IMESafeSearchField
+// （プレーンな NSTextField ラッパー）を使う。SwiftUI の TextField + onKeyPress は
+// 日本語入力の変換中に Enter / 矢印キーを誤って奪ってしまう既知の問題があるため採用していない。
+// 実際のキー操作判定（矢印・Enter・Backspace・Esc・⌘1〜⌘9）は
+// SnippetPanelPresenter 側の NSEvent ローカルモニタで一元的に行う
+// （IME 変換中かどうかを hasMarkedText で判定できるのがそちら側のため）。
+//
+// セクションの描画は PanelPreferences.sectionOrder / enabledSections を ForEach で回す
 // （[[docs-macos-snippet-menu-app-plan]] の設定駆動方針）。
 
+import AppKit
 import SwiftUI
 
 private let panelCornerRadius: CGFloat = 16
 private let panelWidth: CGFloat = 480
 
-/// 検索パネル内で選択可能な1項目。
-private enum PanelListItem: Identifiable {
-    case tag(SnippetTag, snippetCount: Int)
-    case snippet(SnippetSearchMatch)
-
-    var id: String {
-        switch self {
-        case .tag(let tag, _):
-            return "tag-\(tag.id.uuidString)"
-        case .snippet(let match):
-            return "snippet-\(match.snippet.id.uuidString)"
-        }
-    }
-}
-
 struct SnippetPanelView: View {
     @ObservedObject var store: SnippetStore
-    let preferences: PanelPreferences
-    /// スニペットを選んだ時に呼ばれる。挿入処理・使用回数更新・パネルクローズは呼び出し側が担う。
-    let onSelectSnippet: (Snippet) -> Void
+    @ObservedObject var viewModel: SnippetPanelViewModel
     let onOpenEditor: () -> Void
     let onOpenList: () -> Void
     let onOpenSettings: () -> Void
-    let onCancel: () -> Void
-
-    @State private var queryText = ""
-    @State private var selectedTagID: UUID?
-    @State private var highlightedIndex = 0
-    @FocusState private var isSearchFieldFocused: Bool
+    /// 生成された検索フィールドを Presenter へ引き渡す（キー操作は Presenter のキーモニタが担当する）。
+    let onSearchFieldCreated: (NSTextField) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -59,16 +45,12 @@ struct SnippetPanelView: View {
         .shadow(color: .black.opacity(0.24), radius: 20, x: 0, y: 10)
         .onAppear {
             store.reloadIfNeeded()
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(40))
-                isSearchFieldFocused = true
-            }
         }
-        .onChange(of: queryText) { _, _ in
-            highlightedIndex = 0
+        .onChange(of: viewModel.queryText) { _, _ in
+            viewModel.resetHighlightForQueryChange()
         }
-        .onChange(of: selectedTagID) { _, _ in
-            highlightedIndex = 0
+        .onChange(of: viewModel.selectedTagID) { _, _ in
+            viewModel.resetHighlightForQueryChange()
         }
     }
 
@@ -78,20 +60,13 @@ struct SnippetPanelView: View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
-            TextField(L10n.string("panel.search.placeholder"), text: $queryText)
-                .textFieldStyle(.plain)
-                .font(.system(size: 16))
-                .focused($isSearchFieldFocused)
-                .onKeyPress(.upArrow) { handle(.arrowUp) }
-                .onKeyPress(.downArrow) { handle(.arrowDown) }
-                .onKeyPress(.return) { handle(.confirm) }
-                .onKeyPress(.delete) { handleBackspace() }
-                .onKeyPress(characters: .init(charactersIn: "123456789")) { keyPress in
-                    guard let digit = Int(keyPress.characters) else {
-                        return .ignored
-                    }
-                    return handle(.digit(digit))
-                }
+            IMESafeSearchField(
+                text: $viewModel.queryText,
+                placeholder: L10n.string("panel.search.placeholder"),
+                fontSize: 16,
+                onFieldCreated: onSearchFieldCreated
+            )
+            .frame(height: 22)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
@@ -102,10 +77,10 @@ struct SnippetPanelView: View {
     private var resultsList: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 2) {
-                if queryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    browsingContent
-                } else {
+                if viewModel.isSearching {
                     searchResultContent
+                } else {
+                    browsingContent
                 }
             }
             .padding(8)
@@ -114,15 +89,20 @@ struct SnippetPanelView: View {
     }
 
     /// 検索ボックスが空のとき: タグ一覧（ドリルダウン）+ 最近使用したスニペット。
+    ///
+    /// ドリルダウン中は listItems をそのまま enumerated() して描画する。
+    /// 以前は「< タグ名」行と各スニペット行で別々にインデックスを計算していたため
+    /// （viewModel.globalIndex(ofSnippetID:) と snippetsForSelectedTag(_:) を別々に呼ぶ構成）、
+    /// 実際に選択されている項目と表示上のハイライト対象がズレる不具合があった。
+    /// listItems の enumerated() を唯一の情報源にすることで、内容とインデックスが常に一致する。
     @ViewBuilder
     private var browsingContent: some View {
-        if let selectedTagID, let tag = store.library.tags.first(where: { $0.id == selectedTagID }) {
-            drillDownHeader(tag: tag)
-            ForEach(Array(snippetsForSelectedTag(tag.id).enumerated()), id: \.element.id) { index, snippet in
-                rowView(for: snippet, at: index)
+        if viewModel.selectedTagID != nil {
+            ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
+                row(for: item, at: index)
             }
         } else {
-            ForEach(preferences.orderedEnabledSections) { section in
+            ForEach(viewModel.preferences.orderedEnabledSections) { section in
                 sectionView(for: section)
             }
         }
@@ -134,22 +114,21 @@ struct SnippetPanelView: View {
         case .tags:
             if store.library.tags.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.tags"))
-                ForEach(Array(store.library.tags.enumerated()), id: \.element.id) { index, tag in
-                    let itemIndex = listItems.firstIndex { $0.id == "tag-\(tag.id.uuidString)" } ?? index
+                ForEach(store.library.tags) { tag in
                     TagRowView(
                         tag: tag,
-                        snippetCount: snippetCount(for: tag.id),
-                        isSelected: itemIndex == highlightedIndex
+                        snippetCount: viewModel.snippetCount(for: tag.id),
+                        isSelected: viewModel.indexOfTagRow(tag.id) == viewModel.highlightedIndex
                     )
-                    .onTapGesture { selectedTagID = tag.id }
+                    .onTapGesture { viewModel.selectTag(tag.id) }
                 }
             }
         case .recents:
-            let recentSnippets = recentSnippets()
+            let recentSnippets = viewModel.recentSnippets()
             if recentSnippets.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.recents"))
-                ForEach(Array(recentSnippets.enumerated()), id: \.element.id) { _, snippet in
-                    rowView(for: snippet, at: globalIndex(ofSnippetID: snippet.id))
+                ForEach(recentSnippets) { snippet in
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
                 }
             }
         case .allSnippets:
@@ -160,41 +139,39 @@ struct SnippetPanelView: View {
     }
 
     private var searchResultContent: some View {
-        let matches = SnippetSearchEngine.search(
-            query: queryText,
-            in: store.library.snippets,
-            tags: store.library.tags,
-            sortOrder: preferences.searchSortOrder,
-            limit: preferences.searchResultLimit
-        )
-        return ForEach(Array(matches.enumerated()), id: \.element.id) { index, match in
-            SnippetRowView(
-                snippet: match.snippet,
-                tags: tags(for: match.snippet),
-                titleHighlights: match.titleHighlights,
-                bodyHighlights: match.bodyHighlights,
-                isTagColorShown: preferences.isTagColorShown,
-                isSelected: index == highlightedIndex,
-                indexHint: preferences.isNumberKeySelectionEnabled ? index + 1 : nil
-            )
-            .onTapGesture { select(match.snippet) }
+        ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
+            row(for: item, at: index)
         }
     }
 
-    private func drillDownHeader(tag: SnippetTag) -> some View {
-        HStack(spacing: 6) {
-            Button {
-                selectedTagID = nil
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 11, weight: .semibold))
+    /// `listItems` の1項目を、その場でのインデックス（キー操作の解決に使うのと同一の値）で描画する。
+    @ViewBuilder
+    private func row(for item: PanelListItem, at index: Int) -> some View {
+        switch item {
+        case .backToParent:
+            if let selectedTagID = viewModel.selectedTagID, let tag = store.library.tags.first(where: { $0.id == selectedTagID }) {
+                BackRowView(tag: tag, isSelected: index == viewModel.highlightedIndex)
+                    .onTapGesture { viewModel.clearDrillDown() }
             }
-            .buttonStyle(.plain)
-            TagChipView(tag: tag)
-            Spacer()
+        case .tag(let tag, let count):
+            TagRowView(
+                tag: tag,
+                snippetCount: count,
+                isSelected: index == viewModel.highlightedIndex
+            )
+            .onTapGesture { viewModel.selectTag(tag.id) }
+        case .snippet(let match):
+            SnippetRowView(
+                snippet: match.snippet,
+                tags: viewModel.tags(for: match.snippet),
+                titleHighlights: match.titleHighlights,
+                bodyHighlights: match.bodyHighlights,
+                isTagColorShown: viewModel.preferences.isTagColorShown,
+                isSelected: index == viewModel.highlightedIndex,
+                indexHint: viewModel.isSearching && viewModel.preferences.isNumberKeySelectionEnabled ? index + 1 : nil
+            )
+            .onTapGesture { viewModel.selectByIndex(index) }
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 4)
     }
 
     private func sectionHeader(_ title: String) -> some View {
@@ -242,137 +219,16 @@ struct SnippetPanelView: View {
         }
     }
 
-    // MARK: - キー操作
-
-    private func handle(_ event: PanelKeyEvent) -> KeyPress.Result {
-        guard let action = PanelKeyBinding.resolveAction(for: event, preferences: preferences) else {
-            return .ignored
-        }
-        switch action {
-        case .moveSelectionUp:
-            highlightedIndex = max(0, highlightedIndex - 1)
-        case .moveSelectionDown:
-            highlightedIndex = min(listItems.count - 1, highlightedIndex + 1)
-        case .confirmSelection:
-            confirmHighlightedItem()
-        case .cancel:
-            onCancel()
-        case .selectByIndex(let index):
-            guard listItems.indices.contains(index) else {
-                return .ignored
-            }
-            confirmItem(listItems[index])
-        }
-        return .handled
-    }
-
-    /// 検索ボックスが空の状態で Backspace が押された場合、タグのドリルダウンを解除する
-    /// （PopSnip_UI_plan.md「タグドリルダウンは...Backspace で解除」）。
-    /// 検索ボックスに文字が残っている場合は通常の文字削除に委ねる。
-    private func handleBackspace() -> KeyPress.Result {
-        guard queryText.isEmpty, selectedTagID != nil else {
-            return .ignored
-        }
-        selectedTagID = nil
-        return .handled
-    }
-
-    private func confirmHighlightedItem() {
-        guard listItems.indices.contains(highlightedIndex) else {
-            return
-        }
-        confirmItem(listItems[highlightedIndex])
-    }
-
-    private func confirmItem(_ item: PanelListItem) {
-        switch item {
-        case .tag(let tag, _):
-            selectedTagID = tag.id
-        case .snippet(let match):
-            select(match.snippet)
-        }
-    }
-
-    private func select(_ snippet: Snippet) {
-        onSelectSnippet(snippet)
-    }
-
-    // MARK: - データ解決
-
-    /// 現在表示されている項目一覧。キー操作のインデックス解決に使う。
-    private var listItems: [PanelListItem] {
-        if queryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
-            let matches = SnippetSearchEngine.search(
-                query: queryText,
-                in: store.library.snippets,
-                tags: store.library.tags,
-                sortOrder: preferences.searchSortOrder,
-                limit: preferences.searchResultLimit
-            )
-            return matches.map { .snippet($0) }
-        }
-
-        if let selectedTagID {
-            return snippetsForSelectedTag(selectedTagID).map { snippet in
-                .snippet(SnippetSearchMatch(snippet: snippet, score: 0, titleHighlights: [], bodyHighlights: [], tagHighlights: [:]))
-            }
-        }
-
-        var items: [PanelListItem] = []
-        for section in preferences.orderedEnabledSections {
-            switch section {
-            case .tags:
-                items.append(contentsOf: store.library.tags.map { .tag($0, snippetCount: snippetCount(for: $0.id)) })
-            case .recents:
-                items.append(contentsOf: recentSnippets().map { snippet in
-                    .snippet(SnippetSearchMatch(snippet: snippet, score: 0, titleHighlights: [], bodyHighlights: [], tagHighlights: [:]))
-                })
-            case .allSnippets, .favorites:
-                continue
-            }
-        }
-        return items
-    }
-
-    private func globalIndex(ofSnippetID id: UUID) -> Int {
-        listItems.firstIndex { item in
-            if case .snippet(let match) = item {
-                return match.snippet.id == id
-            }
-            return false
-        } ?? 0
-    }
-
     private func rowView(for snippet: Snippet, at index: Int) -> some View {
         SnippetRowView(
             snippet: snippet,
-            tags: tags(for: snippet),
+            tags: viewModel.tags(for: snippet),
             titleHighlights: [],
             bodyHighlights: [],
-            isTagColorShown: preferences.isTagColorShown,
-            isSelected: index == highlightedIndex,
+            isTagColorShown: viewModel.preferences.isTagColorShown,
+            isSelected: index == viewModel.highlightedIndex,
             indexHint: nil
         )
-        .onTapGesture { select(snippet) }
-    }
-
-    private func tags(for snippet: Snippet) -> [SnippetTag] {
-        store.library.tags.filter { snippet.tagIDs.contains($0.id) }
-    }
-
-    private func snippetsForSelectedTag(_ tagID: UUID) -> [Snippet] {
-        store.library.snippets.filter { $0.tagIDs.contains(tagID) }
-    }
-
-    private func snippetCount(for tagID: UUID) -> Int {
-        store.library.snippets.filter { $0.tagIDs.contains(tagID) }.count
-    }
-
-    private func recentSnippets() -> [Snippet] {
-        store.library.snippets
-            .filter { $0.lastUsedAt != nil }
-            .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
-            .prefix(preferences.recentsLimit)
-            .map { $0 }
+        .onTapGesture { viewModel.selectByIndex(index) }
     }
 }
