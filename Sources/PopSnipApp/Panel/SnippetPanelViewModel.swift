@@ -122,8 +122,10 @@ final class SnippetPanelViewModel: ObservableObject {
                 )
             case .recents:
                 items.append(contentsOf: recentSnippets().map { .snippet(emptyMatch(for: $0)) })
-            case .allSnippets, .favorites:
-                continue
+            case .allSnippets:
+                items.append(contentsOf: allSnippets().map { .snippet(emptyMatch(for: $0)) })
+            case .favorites:
+                items.append(contentsOf: favoriteSnippets().map { .snippet(emptyMatch(for: $0)) })
             }
         }
         return items
@@ -266,6 +268,24 @@ final class SnippetPanelViewModel: ObservableObject {
                 .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
                 .prefix(preferences.recentsLimit)
         )
+    }
+
+    /// ライブラリ全件を表示名の昇順で返す。`.recents`（更新日時ベース）と差別化するため、
+    /// 「すべてのスニペット」セクションは名前順の一覧として提示する。
+    func allSnippets() -> [Snippet] {
+        store.library.snippets.sorted {
+            $0.displayTitle.localizedStandardCompare($1.displayTitle) == .orderedAscending
+        }
+    }
+
+    /// お気に入り登録済みのスニペットを、`allSnippets()` と同じ並び順で返す。
+    func favoriteSnippets() -> [Snippet] {
+        allSnippets().filter(\.isFavorite)
+    }
+
+    /// お気に入りの ON/OFF を切り替える。
+    func toggleFavorite(_ snippetID: UUID) {
+        store.toggleFavorite(id: snippetID)
     }
 
     func globalIndex(ofSnippetID id: UUID) -> Int {

@@ -4,10 +4,12 @@
 "window.list.title" = "Snippet List";
 
 /* Menu bar */
-"menu.showPanel" = "Show Search Panel";
-"menu.openList" = "Snippet List...";
-"menu.openSettings" = "Settings...";
-"menu.quit" = "Quit PopSnip";
+"menu.showPanel" = "Show Snippet Panel...";
+"menu.openList" = "Open Snippet List...";
+"menu.checkForUpdates" = "Check for Updates...";
+"menu.openSettings" = "PopSnip Settings...";
+"menu.about" = "About PopSnip...";
+"menu.quit" = "Quit";
 
 /* Panel */
 "panel.search.placeholder" = "Search snippets...";
@@ -18,6 +20,10 @@
 "panel.footer.register" = "Register";
 "panel.footer.list" = "List";
 "panel.footer.settings" = "Settings";
+"panel.row.edit" = "Edit";
+"panel.row.delete" = "Delete";
+"panel.deleteConfirm.title" = "Delete this snippet?";
+"panel.deleteConfirm.message" = "This action cannot be undone.";
 
 /* Editor */
 "editor.title.new" = "New Snippet";
@@ -26,6 +32,7 @@
 "editor.field.title.placeholder" = "Title";
 "editor.field.body" = "Body";
 "editor.field.tags" = "Tags";
+"editor.field.favorite" = "Favorite";
 "editor.field.newTag.placeholder" = "New tag name";
 "editor.button.addTag" = "Add";
 "editor.button.cancel" = "Cancel";
@@ -37,6 +44,8 @@
 /* Tag manager */
 "tagManager.title" = "Tags";
 "tagManager.empty" = "No tags yet.";
+"tagManager.addTag" = "Add a new tag";
+"tagManager.newTag.placeholder" = "New tag name";
 "tagManager.deleteConfirm.title" = "Delete this tag?";
 "tagManager.deleteConfirm.message" = "\"%@\" will be removed from all snippets.";
 
@@ -44,8 +53,8 @@
 "list.filter.placeholder" = "Filter...";
 "list.row.edit" = "Edit";
 "list.bulkTag.menu" = "Tags";
-"list.bulkTag.add" = "Add \"%@\"";
-"list.bulkTag.remove" = "Remove \"%@\"";
+"list.bulkTag.popover.title" = "Edit Tags in Bulk";
+"list.bulkTag.newTag.placeholder" = "New tag name";
 "list.bulkDeleteConfirm.title" = "Delete the selected snippets?";
 
 /* Settings: tabs */
@@ -53,6 +62,7 @@
 "settings.tab.panel" = "Panel";
 "settings.tab.shortcut" = "Shortcut";
 "settings.tab.permission" = "Permission";
+"settings.tab.update" = "Update";
 
 /* Settings: general */
 "settings.general.launchAtLogin" = "Launch at Login";
@@ -64,6 +74,11 @@
 "settings.general.clipboardRestoreDelay" = "Clipboard Restore Delay: %d ms";
 "settings.general.storage" = "Storage";
 "settings.general.revealInFinder" = "Reveal in Finder";
+"settings.general.appearance" = "Appearance";
+"settings.general.fontSize" = "Font Size";
+"settings.general.fontSize.small" = "Small";
+"settings.general.fontSize.medium" = "Medium";
+"settings.general.fontSize.large" = "Large";
 
 /* Settings: panel layout */
 "settings.panel.sections" = "Sections (drag to reorder)";
@@ -94,11 +109,18 @@
 "settings.shortcut.unassigned" = "Not Set";
 "settings.shortcut.recording" = "Press keys...";
 "settings.shortcut.clear" = "Clear";
-"settings.shortcut.reservedForFutureUse" = "Reserved for a future version.";
 
 /* Permission */
+"permission.label.accessibility" = "Accessibility Access";
 "permission.status.granted" = "Accessibility access granted";
 "permission.status.notGranted" = "Accessibility access required";
 "permission.description" = "PopSnip needs Accessibility permission to insert snippets into the focused text field of other apps.";
 "permission.button.openSettings" = "Open System Settings";
 "permission.button.refresh" = "Refresh Status";
+
+/* Settings: update */
+"settings.update.currentVersion" = "Current Version";
+"settings.update.lastChecked" = "Last Checked";
+"settings.update.lastChecked.never" = "Never";
+"settings.update.checkNow" = "Check Now";
+"settings.update.automaticChecks" = "Automatically Check for Updates";

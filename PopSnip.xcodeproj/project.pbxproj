@@ -12,9 +12,11 @@
 		0CA56064650D1B14FF532AC3 /* IMESafeSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */; };
 		0EBADA37A1BB882A15F88890 /* SnippetTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A92085458711C77C7CE771 /* SnippetTag.swift */; };
 		1720783BCFAC93F8972B13ED /* SnippetRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65853605E72D11ED5241B812 /* SnippetRowView.swift */; };
+		1C4F9C6E428F6FEF2A2CDCF4 /* ShortcutChangeNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345525B9C27DF7E5C50DF885 /* ShortcutChangeNotification.swift */; };
 		1CCB9BFC909E0AAE3D52ACA6 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC43078BE3B62AB664F90E0D /* SnippetStore.swift */; };
 		1D37FF026B461754C1675348 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2378DD408D94AD4EEF543F9 /* AppLogger.swift */; };
 		2571C1538FB2BCB2FD3AD5C9 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98F87651CB2DB9DFAFAF4087 /* SnippetStoreTests.swift */; };
+		2633CED19623A14E5D34B2F9 /* PanelFooterButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C270739096C864F1DFEF283 /* PanelFooterButtonStyle.swift */; };
 		2BD4ACEE415E5976C7D0EF1C /* TagChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1620B97F23F35CBA7085E706 /* TagChipView.swift */; };
 		326C70369AE57EB513C76680 /* SnippetLibraryCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58B10C162E0DF339FA7B586 /* SnippetLibraryCodableTests.swift */; };
 		3367655509FCA94C2CE76506 /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D4D46B7B64A8682B94EF3E /* Snippet.swift */; };
@@ -22,15 +24,17 @@
 		420B59719E8DB8A08B5B3753 /* SnippetLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B736AD617CD07D956DD8A1E /* SnippetLibrary.swift */; };
 		44CA8E429FBFFEFDD333A3A9 /* PanelPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EC31FF0535255EC56CF9BA /* PanelPreferences.swift */; };
 		50F0A3BE475F01D770934FE1 /* SnippetPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */; };
-		5175CF1D7ABCF451A3362027 /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5C31F8B1BB9C9A559A698F /* SettingsTabView.swift */; };
 		51CFCA694E9934B8DD37BF5B /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */; };
 		535763C8305BB1AD15609796 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2409091F46EDE1F841DE459F /* TagManagerView.swift */; };
 		57BFE64B3096F0CBFBE14EA8 /* HighlightRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A49D959D06B15CD1F3E50A /* HighlightRange.swift */; };
 		5F5DE97F9AA825D59B4F47A7 /* SnippetSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */; };
+		67C2454C962847C06ACF31B9 /* UpdateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */; };
 		6995E7E990FBE3741F2DC773 /* AccessibilityInserter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F6A7552603C41A6B28042C /* AccessibilityInserter.swift */; };
+		71B9A12D2D6575AFC684F4CA /* AppFontSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36879BC782CA4E30A4AB5ADB /* AppFontSize.swift */; };
 		74FB58E8466DBFF0877F2956 /* ShortcutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E572148634A39D309933E61 /* ShortcutSettingsView.swift */; };
 		7BE71C3A4E1D50EFF7FDE2D6 /* PopSnipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86705B4320DA0A0D4BD4EA8 /* PopSnipApp.swift */; };
 		7D4E048BBE9CDBEECC204212 /* AppSettingsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC6D097B5EEA2803536221 /* AppSettingsResolver.swift */; };
+		82B31EEF454DFB7E203439CA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572E96814EFC007DE981D4A7 /* SettingsView.swift */; };
 		84BDEE508A86896BEAF7C1F2 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4123CD1F304EEA9E671397A /* SettingsWindowController.swift */; };
 		8D1CF3B132415D03AD4A96F8 /* SnippetSearchEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A608A5329F7D0E2499AFC8C /* SnippetSearchEngineTests.swift */; };
 		8F6846EDBCD59477A5CDC4AA /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1613116158D85AB858BF0BC /* SnippetEditorView.swift */; };
@@ -42,11 +46,15 @@
 		A33713FF9899E5088E15918D /* SnippetInsertionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A05CCDE509E3ACE7243D4F /* SnippetInsertionService.swift */; };
 		A8C048B2AF46BAD004C21CF3 /* SnippetPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E7BBC98E9C70A7B8926B4A /* SnippetPanelView.swift */; };
 		AA1198C76291EE679C54F747 /* SnippetPanelPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13E21E55D335BC55A48FDE /* SnippetPanelPresenter.swift */; };
+		B297220AFF0E54F967EFE32F /* AppUpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711398CDEE7FF3485093EB18 /* AppUpdateController.swift */; };
 		B9E1138CC7B33207A9503874 /* SnippetPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04814C0409EAAA7AF0CDA6C2 /* SnippetPanel.swift */; };
 		B9E3EA16F073C419AE5BB59F /* SnippetListWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21584A2D231F55DD730138EE /* SnippetListWindowView.swift */; };
+		BB5489CD5B32FBD0A5790AFC /* BulkTagPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB7694AE09BA2621A7577A7 /* BulkTagPopoverView.swift */; };
 		BE315B8D1ACAA99418445A29 /* ClipboardInserter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CC3FFC58DD24DB8D13AA8E /* ClipboardInserter.swift */; };
+		BFCFD8B0C7ED791B7CF2E27A /* TagFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E901DB87647316F8CB9FFBC /* TagFlowLayout.swift */; };
 		C5DDE67FC90C494331E5FF25 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D982C51F8228B3ECA4D58150 /* GeneralSettingsView.swift */; };
 		C679725F45E3CF608AACAE90 /* FocusSnapshotResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D41A631750341F288448FC /* FocusSnapshotResolver.swift */; };
+		CC174DB150B7291EB59C706B /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = E74B45CD0820E0DE1188C785 /* Sparkle */; };
 		D30687BE981D0587A1AB1B0F /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB0AD5799E423947A523DB6 /* StatusBarController.swift */; };
 		D38BF624DCDE1CDDB6F11C0C /* PanelSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD23C3A05C3E6AC89275A736 /* PanelSection.swift */; };
 		DC737872A7C980B9F3B52F5E /* GlobalShortcutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E264FD3D6202EAE5ECC7DF /* GlobalShortcutService.swift */; };
@@ -56,6 +64,7 @@
 		E6D6A0490F4F3F54A97C4320 /* PanelKeyBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3E5707D79EDB01D9650298 /* PanelKeyBinding.swift */; };
 		EB6858F8C37CEBE4C857C784 /* PanelLayoutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1033127A5ACC79C196FE4EFE /* PanelLayoutSettingsView.swift */; };
 		ED997162CB2C6E468FA33BEF /* InsertionTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770A409AC8CD67821C0AEF27 /* InsertionTarget.swift */; };
+		F41B3C38C15C8BE0E9BF9B99 /* AppFontSizeEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D77749F4617D9A26209FEC9 /* AppFontSizeEnvironment.swift */; };
 		F8A14F0AF5202CB4B5E4E5F3 /* AppSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936B37776C6D534C528D2FCA /* AppSharedState.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +81,8 @@
 /* Begin PBXFileReference section */
 		025C61468D3BF670EE3B879B /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		04814C0409EAAA7AF0CDA6C2 /* SnippetPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanel.swift; sourceTree = "<group>"; };
+		0D77749F4617D9A26209FEC9 /* AppFontSizeEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFontSizeEnvironment.swift; sourceTree = "<group>"; };
+		0E901DB87647316F8CB9FFBC /* TagFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFlowLayout.swift; sourceTree = "<group>"; };
 		1033127A5ACC79C196FE4EFE /* PanelLayoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelLayoutSettingsView.swift; sourceTree = "<group>"; };
 		1620B97F23F35CBA7085E706 /* TagChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChipView.swift; sourceTree = "<group>"; };
 		21584A2D231F55DD730138EE /* SnippetListWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListWindowView.swift; sourceTree = "<group>"; };
@@ -79,6 +90,8 @@
 		2409091F46EDE1F841DE459F /* TagManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagManagerView.swift; sourceTree = "<group>"; };
 		29FD76342E46857A754C2CA4 /* SnippetListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListWindowController.swift; sourceTree = "<group>"; };
 		32CC3FFC58DD24DB8D13AA8E /* ClipboardInserter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardInserter.swift; sourceTree = "<group>"; };
+		345525B9C27DF7E5C50DF885 /* ShortcutChangeNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutChangeNotification.swift; sourceTree = "<group>"; };
+		36879BC782CA4E30A4AB5ADB /* AppFontSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFontSize.swift; sourceTree = "<group>"; };
 		38B95712B9827184CD3931EA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3B736AD617CD07D956DD8A1E /* SnippetLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetLibrary.swift; sourceTree = "<group>"; };
 		3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevelopmentTeam.xcconfig; sourceTree = "<group>"; };
@@ -87,10 +100,13 @@
 		4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMESafeSearchField.swift; sourceTree = "<group>"; };
 		502B8E2A8FE5177C8CA4754D /* AccessibilityPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermission.swift; sourceTree = "<group>"; };
 		54E7BBC98E9C70A7B8926B4A /* SnippetPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanelView.swift; sourceTree = "<group>"; };
+		572E96814EFC007DE981D4A7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5C270739096C864F1DFEF283 /* PanelFooterButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelFooterButtonStyle.swift; sourceTree = "<group>"; };
 		5F2885602E4D1F75F5BD1871 /* PanelShortcutConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelShortcutConfiguration.swift; sourceTree = "<group>"; };
 		65853605E72D11ED5241B812 /* SnippetRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetRowView.swift; sourceTree = "<group>"; };
 		66BD23DFEEEB844ECF4FE946 /* PermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionView.swift; sourceTree = "<group>"; };
 		6A608A5329F7D0E2499AFC8C /* SnippetSearchEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSearchEngineTests.swift; sourceTree = "<group>"; };
+		711398CDEE7FF3485093EB18 /* AppUpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateController.swift; sourceTree = "<group>"; };
 		74D4D46B7B64A8682B94EF3E /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
 		770A409AC8CD67821C0AEF27 /* InsertionTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertionTarget.swift; sourceTree = "<group>"; };
 		7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
@@ -121,15 +137,28 @@
 		D982C51F8228B3ECA4D58150 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		DA5C8835B5709CBA2F700C9A /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		E1613116158D85AB858BF0BC /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
+		E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsView.swift; sourceTree = "<group>"; };
+		EAB7694AE09BA2621A7577A7 /* BulkTagPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkTagPopoverView.swift; sourceTree = "<group>"; };
 		EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSearchEngine.swift; sourceTree = "<group>"; };
 		F887A6CA6F6DDEC32FF4E7F2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		FB5C31F8B1BB9C9A559A698F /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2E84E254D7B986FF777734AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC174DB150B7291EB59C706B /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0138DCDF0978D7CA35A97C09 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				36879BC782CA4E30A4AB5ADB /* AppFontSize.swift */,
 				BAAC6D097B5EEA2803536221 /* AppSettingsResolver.swift */,
 				BE71B71E5A7F5C9E931F812B /* LaunchAtLoginManager.swift */,
 				BE3E5707D79EDB01D9650298 /* PanelKeyBinding.swift */,
@@ -143,6 +172,7 @@
 		04F1243CE585A72990DD6E17 /* PopSnipApp */ = {
 			isa = PBXGroup;
 			children = (
+				0D77749F4617D9A26209FEC9 /* AppFontSizeEnvironment.swift */,
 				D2378DD408D94AD4EEF543F9 /* AppLogger.swift */,
 				936B37776C6D534C528D2FCA /* AppSharedState.swift */,
 				025C61468D3BF670EE3B879B /* DesignTokens.swift */,
@@ -152,6 +182,7 @@
 				84C5B5D5BBACF44F4F516C3D /* MenuBar */,
 				E257F04310F2248337031CD2 /* Panel */,
 				3B0B81D0DE578960B8B8BD11 /* Settings */,
+				F34E04D199B1183BD2360017 /* Update */,
 			);
 			path = PopSnipApp;
 			sourceTree = "<group>";
@@ -159,10 +190,12 @@
 		0A853E592B71648676B3CC4A /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				EAB7694AE09BA2621A7577A7 /* BulkTagPopoverView.swift */,
 				E1613116158D85AB858BF0BC /* SnippetEditorView.swift */,
 				443CA035B2EBAB6AD3673A25 /* SnippetEditorWindowController.swift */,
 				29FD76342E46857A754C2CA4 /* SnippetListWindowController.swift */,
 				21584A2D231F55DD730138EE /* SnippetListWindowView.swift */,
+				0E901DB87647316F8CB9FFBC /* TagFlowLayout.swift */,
 				2409091F46EDE1F841DE459F /* TagManagerView.swift */,
 			);
 			path = Editor;
@@ -192,9 +225,10 @@
 				D982C51F8228B3ECA4D58150 /* GeneralSettingsView.swift */,
 				1033127A5ACC79C196FE4EFE /* PanelLayoutSettingsView.swift */,
 				66BD23DFEEEB844ECF4FE946 /* PermissionView.swift */,
-				FB5C31F8B1BB9C9A559A698F /* SettingsTabView.swift */,
+				572E96814EFC007DE981D4A7 /* SettingsView.swift */,
 				D4123CD1F304EEA9E671397A /* SettingsWindowController.swift */,
 				7E572148634A39D309933E61 /* ShortcutSettingsView.swift */,
+				E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -263,6 +297,7 @@
 				44E264FD3D6202EAE5ECC7DF /* GlobalShortcutService.swift */,
 				5F2885602E4D1F75F5BD1871 /* PanelShortcutConfiguration.swift */,
 				232A5DDAE0509F9E056ADE78 /* PopSnipShortcutAction.swift */,
+				345525B9C27DF7E5C50DF885 /* ShortcutChangeNotification.swift */,
 			);
 			path = Shortcut;
 			sourceTree = "<group>";
@@ -294,6 +329,7 @@
 			isa = PBXGroup;
 			children = (
 				4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */,
+				5C270739096C864F1DFEF283 /* PanelFooterButtonStyle.swift */,
 				04814C0409EAAA7AF0CDA6C2 /* SnippetPanel.swift */,
 				9A13E21E55D335BC55A48FDE /* SnippetPanelPresenter.swift */,
 				54E7BBC98E9C70A7B8926B4A /* SnippetPanelView.swift */,
@@ -310,6 +346,14 @@
 				71FB53A4943EB1A61C830D86 /* Localizable.strings */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		F34E04D199B1183BD2360017 /* Update */ = {
+			isa = PBXGroup;
+			children = (
+				711398CDEE7FF3485093EB18 /* AppUpdateController.swift */,
+			);
+			path = Update;
 			sourceTree = "<group>";
 		};
 		F9A79FC892664658B8175C40 /* Sources */ = {
@@ -349,6 +393,7 @@
 			buildPhases = (
 				F1F22A41A3845EB982E23065 /* Sources */,
 				08AE5F9A0B682E266081685C /* Resources */,
+				2E84E254D7B986FF777734AF /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -356,6 +401,7 @@
 			);
 			name = PopSnip;
 			packageProductDependencies = (
+				E74B45CD0820E0DE1188C785 /* Sparkle */,
 			);
 			productName = PopSnip;
 			productReference = 7FFB800CECAB88E5D00D7F14 /* PopSnip.app */;
@@ -368,7 +414,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2660;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					4CA15E98B87976149D7A3AF7 = {
 						ProvisioningStyle = Automatic;
@@ -388,6 +434,9 @@
 			);
 			mainGroup = B5849918AC4F04FDC154B52B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8A21F8F83587AF3BA7FF510C /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 117BEF1A425F08ABAEB97513 /* Products */;
 			projectDirPath = "";
@@ -427,9 +476,13 @@
 			files = (
 				6995E7E990FBE3741F2DC773 /* AccessibilityInserter.swift in Sources */,
 				07078A58B613ECB9261AFE19 /* AccessibilityPermission.swift in Sources */,
+				71B9A12D2D6575AFC684F4CA /* AppFontSize.swift in Sources */,
+				F41B3C38C15C8BE0E9BF9B99 /* AppFontSizeEnvironment.swift in Sources */,
 				1D37FF026B461754C1675348 /* AppLogger.swift in Sources */,
 				7D4E048BBE9CDBEECC204212 /* AppSettingsResolver.swift in Sources */,
 				F8A14F0AF5202CB4B5E4E5F3 /* AppSharedState.swift in Sources */,
+				B297220AFF0E54F967EFE32F /* AppUpdateController.swift in Sources */,
+				BB5489CD5B32FBD0A5790AFC /* BulkTagPopoverView.swift in Sources */,
 				BE315B8D1ACAA99418445A29 /* ClipboardInserter.swift in Sources */,
 				06F33A055376B5B80ECAFD98 /* DesignTokens.swift in Sources */,
 				C679725F45E3CF608AACAE90 /* FocusSnapshotResolver.swift in Sources */,
@@ -440,6 +493,7 @@
 				ED997162CB2C6E468FA33BEF /* InsertionTarget.swift in Sources */,
 				E015D64D532D564AF0B44D65 /* LaunchAtLoginManager.swift in Sources */,
 				3BA7404074E78609F35A802B /* Localization.swift in Sources */,
+				2633CED19623A14E5D34B2F9 /* PanelFooterButtonStyle.swift in Sources */,
 				E6D6A0490F4F3F54A97C4320 /* PanelKeyBinding.swift in Sources */,
 				EB6858F8C37CEBE4C857C784 /* PanelLayoutSettingsView.swift in Sources */,
 				44CA8E429FBFFEFDD333A3A9 /* PanelPreferences.swift in Sources */,
@@ -448,8 +502,9 @@
 				93D475E4C862A00AFB20AE95 /* PermissionView.swift in Sources */,
 				7BE71C3A4E1D50EFF7FDE2D6 /* PopSnipApp.swift in Sources */,
 				E5E5D98467515BD864388CAA /* PopSnipShortcutAction.swift in Sources */,
-				5175CF1D7ABCF451A3362027 /* SettingsTabView.swift in Sources */,
+				82B31EEF454DFB7E203439CA /* SettingsView.swift in Sources */,
 				84BDEE508A86896BEAF7C1F2 /* SettingsWindowController.swift in Sources */,
+				1C4F9C6E428F6FEF2A2CDCF4 /* ShortcutChangeNotification.swift in Sources */,
 				74FB58E8466DBFF0877F2956 /* ShortcutSettingsView.swift in Sources */,
 				3367655509FCA94C2CE76506 /* Snippet.swift in Sources */,
 				8F6846EDBCD59477A5CDC4AA /* SnippetEditorView.swift in Sources */,
@@ -469,7 +524,9 @@
 				D30687BE981D0587A1AB1B0F /* StatusBarController.swift in Sources */,
 				2BD4ACEE415E5976C7D0EF1C /* TagChipView.swift in Sources */,
 				E008D59ABBFA95C3DC695DC8 /* TagColorAssigner.swift in Sources */,
+				BFCFD8B0C7ED791B7CF2E27A /* TagFlowLayout.swift in Sources */,
 				535763C8305BB1AD15609796 /* TagManagerView.swift in Sources */,
+				67C2454C962847C06ACF31B9 /* UpdateSettingsView.swift in Sources */,
 				51CFCA694E9934B8DD37BF5B /* UserDefaultsKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,7 +559,6 @@
 			baseConfigurationReference = 3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -536,13 +592,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = UAC4B833KN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -565,7 +618,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -578,7 +630,6 @@
 			baseConfigurationReference = 3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -612,13 +663,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = UAC4B833KN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -634,7 +682,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -647,7 +694,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -666,7 +712,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -685,13 +730,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;
@@ -703,13 +744,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;
@@ -747,6 +784,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8A21F8F83587AF3BA7FF510C /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E74B45CD0820E0DE1188C785 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8A21F8F83587AF3BA7FF510C /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 273EB0C318CA5247CB4944BD /* Project object */;
 }

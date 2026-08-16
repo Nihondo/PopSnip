@@ -57,4 +57,24 @@ struct SnippetLibraryCodableTests {
         let snippet = Snippet(body: "1行目\n2行目")
         #expect(snippet.displayTitle == "1行目")
     }
+
+    @Test("isFavorite キーを持たない旧形式の JSON もデコードでき、false 扱いになる")
+    func decodingOmitsIsFavoriteDefaultsToFalse() throws {
+        // isFavorite フィールド追加前に保存された snippets.json を模した、このキーを含まない JSON。
+        // 既存ユーザーのデータを壊さないための回帰テスト（decodeIfPresent(...) ?? false の検証）。
+        let legacyJSON = """
+        {
+          "id": "6E50450C-1594-4E31-8983-689F5B5EF68D",
+          "body": "systemctl status",
+          "tagIDs": [],
+          "createdAt": "2026-08-16T13:57:31Z",
+          "updatedAt": "2026-08-16T13:57:31Z",
+          "usageCount": 3
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let decodedSnippet = try decoder.decode(Snippet.self, from: Data(legacyJSON.utf8))
+        #expect(decodedSnippet.isFavorite == false)
+    }
 }

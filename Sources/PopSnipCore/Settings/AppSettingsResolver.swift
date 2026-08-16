@@ -69,6 +69,22 @@ public enum AppSettingsResolver {
         if userDefaults.object(forKey: UserDefaultsKeys.clipboardRestoreDelayMs) != nil {
             preferences.clipboardRestoreDelayMs = userDefaults.integer(forKey: UserDefaultsKeys.clipboardRestoreDelayMs)
         }
+        if
+            let fontSizeRawValue = userDefaults.string(forKey: UserDefaultsKeys.panelFontSize),
+            let fontSize = AppFontSize(rawValue: fontSizeRawValue)
+        {
+            preferences.fontSize = fontSize
+        }
+
+        // マイグレーション: コード上の defaultOrder に新しく追加されたセクション（例: .favorites）が、
+        // 既に永続化済みの sectionOrder に含まれていない場合は末尾へ補い、有効セクションにも加える。
+        // これにより、新しい PanelSection を追加しても、保存済み設定を持つ既存インストールで
+        // 設定画面の選択肢から漏れ続けることを防ぐ。
+        let missingSections = PanelSection.defaultOrder.filter { preferences.sectionOrder.contains($0) == false }
+        if missingSections.isEmpty == false {
+            preferences.sectionOrder.append(contentsOf: missingSections)
+            preferences.enabledSections.formUnion(missingSections)
+        }
 
         return preferences
     }
@@ -92,6 +108,31 @@ public enum AppSettingsResolver {
         )
         userDefaults.set(preferences.isTagColorShown, forKey: UserDefaultsKeys.panelIsTagColorShown)
         userDefaults.set(preferences.clipboardRestoreDelayMs, forKey: UserDefaultsKeys.clipboardRestoreDelayMs)
+        userDefaults.set(preferences.fontSize.rawValue, forKey: UserDefaultsKeys.panelFontSize)
+    }
+
+    // MARK: - パネルウインドウサイズ
+
+    /// 検索パネルの直前のウインドウサイズ（幅・高さの両方をリサイズ・記憶できるようにするため）。
+    /// 未保存の場合は nil を返し、呼び出し側で既定サイズにフォールバックする。
+    public static func resolvePanelWindowSize(userDefaults: UserDefaults = .standard) -> CGSize? {
+        guard
+            userDefaults.object(forKey: UserDefaultsKeys.panelWindowWidth) != nil,
+            userDefaults.object(forKey: UserDefaultsKeys.panelWindowHeight) != nil
+        else {
+            return nil
+        }
+        let width = userDefaults.double(forKey: UserDefaultsKeys.panelWindowWidth)
+        let height = userDefaults.double(forKey: UserDefaultsKeys.panelWindowHeight)
+        guard width > 0, height > 0 else {
+            return nil
+        }
+        return CGSize(width: width, height: height)
+    }
+
+    public static func savePanelWindowSize(_ size: CGSize, userDefaults: UserDefaults = .standard) {
+        userDefaults.set(Double(size.width), forKey: UserDefaultsKeys.panelWindowWidth)
+        userDefaults.set(Double(size.height), forKey: UserDefaultsKeys.panelWindowHeight)
     }
 
     // MARK: - ショートカット

@@ -4,10 +4,12 @@
 "window.list.title" = "スニペット一覧";
 
 /* メニューバー */
-"menu.showPanel" = "検索パネルを開く";
-"menu.openList" = "スニペット一覧...";
-"menu.openSettings" = "設定...";
-"menu.quit" = "PopSnip を終了";
+"menu.showPanel" = "スニペットパネルを開く...";
+"menu.openList" = "スニペット一覧を開く...";
+"menu.checkForUpdates" = "アップデートを確認...";
+"menu.openSettings" = "PopSnip 設定...";
+"menu.about" = "PopSnip について...";
+"menu.quit" = "終了";
 
 /* パネル */
 "panel.search.placeholder" = "スニペットを検索...";
@@ -18,6 +20,10 @@
 "panel.footer.register" = "登録";
 "panel.footer.list" = "一覧";
 "panel.footer.settings" = "設定";
+"panel.row.edit" = "編集";
+"panel.row.delete" = "削除";
+"panel.deleteConfirm.title" = "このスニペットを削除しますか？";
+"panel.deleteConfirm.message" = "この操作は取り消せません。";
 
 /* 登録・編集 */
 "editor.title.new" = "新規スニペット";
@@ -26,6 +32,7 @@
 "editor.field.title.placeholder" = "タイトル";
 "editor.field.body" = "本文";
 "editor.field.tags" = "タグ";
+"editor.field.favorite" = "お気に入り";
 "editor.field.newTag.placeholder" = "新しいタグ名";
 "editor.button.addTag" = "追加";
 "editor.button.cancel" = "キャンセル";
@@ -37,6 +44,8 @@
 /* タグ管理 */
 "tagManager.title" = "タグ";
 "tagManager.empty" = "タグはまだありません。";
+"tagManager.addTag" = "新規タグを追加";
+"tagManager.newTag.placeholder" = "新しいタグ名";
 "tagManager.deleteConfirm.title" = "このタグを削除しますか？";
 "tagManager.deleteConfirm.message" = "「%@」がすべてのスニペットから削除されます。";
 
@@ -44,8 +53,8 @@
 "list.filter.placeholder" = "絞り込み...";
 "list.row.edit" = "編集";
 "list.bulkTag.menu" = "タグ";
-"list.bulkTag.add" = "「%@」を付与";
-"list.bulkTag.remove" = "「%@」を削除";
+"list.bulkTag.popover.title" = "タグを一括編集";
+"list.bulkTag.newTag.placeholder" = "新しいタグ名";
 "list.bulkDeleteConfirm.title" = "選択したスニペットを削除しますか？";
 
 /* 設定タブ */
@@ -53,6 +62,7 @@
 "settings.tab.panel" = "パネル表示";
 "settings.tab.shortcut" = "ショートカット";
 "settings.tab.permission" = "権限";
+"settings.tab.update" = "アップデート";
 
 /* 設定: 一般 */
 "settings.general.launchAtLogin" = "ログイン時に起動";
@@ -64,6 +74,11 @@
 "settings.general.clipboardRestoreDelay" = "クリップボード復元待機時間: %d ms";
 "settings.general.storage" = "保存先";
 "settings.general.revealInFinder" = "Finder で表示";
+"settings.general.appearance" = "表示";
+"settings.general.fontSize" = "フォントサイズ";
+"settings.general.fontSize.small" = "小";
+"settings.general.fontSize.medium" = "中";
+"settings.general.fontSize.large" = "大";
 
 /* 設定: パネル表示 */
 "settings.panel.sections" = "セクション（ドラッグで並び替え）";
@@ -94,11 +109,18 @@
 "settings.shortcut.unassigned" = "未設定";
 "settings.shortcut.recording" = "キーを押してください...";
 "settings.shortcut.clear" = "クリア";
-"settings.shortcut.reservedForFutureUse" = "将来のバージョンのために予約されています。";
 
 /* 権限 */
+"permission.label.accessibility" = "アクセシビリティ権限";
 "permission.status.granted" = "アクセシビリティ権限が許可されています";
 "permission.status.notGranted" = "アクセシビリティ権限が必要です";
 "permission.description" = "PopSnip が他のアプリのフォーカス中の入力欄へスニペットを挿入するには、アクセシビリティ権限が必要です。";
 "permission.button.openSettings" = "システム設定を開く";
 "permission.button.refresh" = "状態を再確認";
+
+/* 設定: アップデート */
+"settings.update.currentVersion" = "現在のバージョン";
+"settings.update.lastChecked" = "最終確認日時";
+"settings.update.lastChecked.never" = "未確認";
+"settings.update.checkNow" = "今すぐ確認";
+"settings.update.automaticChecks" = "自動的にアップデートを確認";

@@ -28,12 +28,15 @@ struct SnippetRowView: View {
     let isTagColorShown: Bool
     let isSelected: Bool
     let indexHint: Int?
+    let onToggleFavorite: () -> Void
+
+    @Environment(\.appFontSize) private var appFontSize
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             if let indexHint, (1...9).contains(indexHint) {
                 Text("\(indexHint)")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(appFontSize.font(DesignTokens.Typography.indexHint, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.tertiary)
                     .frame(width: 14, alignment: .trailing)
             }
@@ -42,7 +45,7 @@ struct SnippetRowView: View {
                 highlightedText(
                     snippet.displayTitle,
                     ranges: titleHighlights,
-                    baseFont: .system(size: 13, weight: .medium)
+                    baseFont: appFontSize.font(DesignTokens.Typography.rowTitle, weight: .medium)
                 )
                 .lineLimit(1)
 
@@ -50,7 +53,7 @@ struct SnippetRowView: View {
                     highlightedText(
                         bodyExcerpt,
                         ranges: bodyHighlights,
-                        baseFont: .system(size: 11)
+                        baseFont: appFontSize.font(DesignTokens.Typography.rowBody)
                     )
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -67,8 +70,16 @@ struct SnippetRowView: View {
             }
 
             Spacer(minLength: 0)
+
+            // お気に入りトグル。Button のタップ判定は行全体の .onTapGesture より優先されるため、
+            // 星をクリックしても行の選択・挿入は発火しない。
+            Button(action: onToggleFavorite) {
+                Image(systemName: snippet.isFavorite ? "star.fill" : "star")
+                    .foregroundStyle(snippet.isFavorite ? AnyShapeStyle(Color.yellow) : AnyShapeStyle(.tertiary))
+            }
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 14)
         .padding(.vertical, 6)
         .panelRowHighlight(isSelected: isSelected)
         .contentShape(Rectangle())
@@ -116,18 +127,20 @@ struct TagRowView: View {
     let snippetCount: Int
     let isSelected: Bool
 
+    @Environment(\.appFontSize) private var appFontSize
+
     var body: some View {
         HStack {
             TagChipView(tag: tag)
             Text("\(snippetCount)")
-                .font(.system(size: 11))
+                .font(appFontSize.font(DesignTokens.Typography.rowBody))
                 .foregroundStyle(.tertiary)
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(.tertiary)
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 14)
         .padding(.vertical, 6)
         .panelRowHighlight(isSelected: isSelected)
         .contentShape(Rectangle())
@@ -154,7 +167,7 @@ struct BackRowView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 14)
         .padding(.vertical, 6)
         .panelRowHighlight(isSelected: isSelected)
         .contentShape(Rectangle())

@@ -3,6 +3,7 @@
 // timeSlice/Sources/timeSliceApp/AppSettings.swift の CaptureNowShortcutConfiguration /
 // CaptureNowShortcutResolver を、単一アクション専用から `PopSnipShortcutAction` 汎用へ一般化して移植。
 
+import AppKit
 import Carbon
 import Foundation
 import SwiftUI
@@ -25,6 +26,31 @@ public struct PanelShortcutConfiguration: Equatable, Sendable {
 
     public var displayText: String {
         PanelShortcutResolver.makeDisplayText(key: key, modifiers: eventModifiers)
+    }
+
+    /// メニューバーの `NSMenuItem.keyEquivalent` に渡す文字列。
+    /// `"space"` のような特殊キー名は `NSMenuItem` が解釈できる1文字表現に変換する。
+    public var menuKeyEquivalent: String {
+        key == "space" ? " " : key
+    }
+
+    /// メニューバーの `NSMenuItem.keyEquivalentModifierMask` に渡す修飾キー。
+    public var menuKeyEquivalentModifierMask: NSEvent.ModifierFlags {
+        var flags: NSEvent.ModifierFlags = []
+        let modifiers = eventModifiers
+        if modifiers.contains(.command) {
+            flags.insert(.command)
+        }
+        if modifiers.contains(.control) {
+            flags.insert(.control)
+        }
+        if modifiers.contains(.option) {
+            flags.insert(.option)
+        }
+        if modifiers.contains(.shift) {
+            flags.insert(.shift)
+        }
+        return flags
     }
 
     /// MVP 既定値: ⌥⌘Space。

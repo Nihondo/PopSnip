@@ -24,7 +24,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
     private var isHandlingPanelAction = false
 
     /// 登録・一覧・設定ボタンが押されたときのハンドラ。AppSharedState 側から注入する。
-    var onOpenEditor: ((_ target: InsertionTarget?) -> Void)?
+    /// `editingSnippetID` は右クリックメニューからの編集時のみ非 nil（[[docs-macos-snippet-menu-app-plan]]）。
+    var onOpenEditor: ((_ editingSnippetID: UUID?, _ target: InsertionTarget?) -> Void)?
     var onOpenList: (() -> Void)?
     var onOpenSettings: (() -> Void)?
 
@@ -69,7 +70,7 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
 
         let panel = SnippetPanel(
             contentRect: NSRect(x: 0, y: 0, width: DesignTokens.WindowSize.panelWidth, height: 1),
-            styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
+            styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView, .resizable],
             backing: .buffered,
             defer: false
         )
@@ -83,6 +84,10 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         panel.hidesOnDeactivate = false
         panel.isMovableByWindowBackground = true
         panel.animationBehavior = .utilityWindow
+        panel.minSize = NSSize(
+            width: DesignTokens.WindowSize.panelMinWidth,
+            height: DesignTokens.WindowSize.panelMinHeight
+        )
 
         let viewModel = SnippetPanelViewModel(
             store: store,
@@ -99,8 +104,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         let panelView = SnippetPanelView(
             store: store,
             viewModel: viewModel,
-            onOpenEditor: { [weak self] in
-                self?.openEditorAndClose()
+            onOpenEditor: { [weak self] editingSnippetID in
+                self?.openEditorAndClose(editingSnippetID: editingSnippetID)
             },
             onOpenList: { [weak self] in
                 self?.performActionAndClose { self?.onOpenList?() }
@@ -108,13 +113,16 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             onOpenSettings: { [weak self] in
                 self?.performActionAndClose { self?.onOpenSettings?() }
             },
+            onDeleteSnippet: { [weak self] snippet in
+                self?.confirmAndDeleteSnippet(snippet)
+            },
             onSearchFieldCreated: { [weak self] field in
                 self?.searchField = field
             }
         )
-        let hostingView = NSHostingView(rootView: panelView)
+        let hostingView = NSHostingView(rootView: panelView.environment(\.appFontSize, preferences.fontSize))
         panel.contentView = hostingView
-        panel.setContentSize(hostingView.fittingSize)
+        panel.setContentSize(resolvePanelContentSize(fittingSize: hostingView.fittingSize))
         configurePanelShape(panel)
 
         activePanel = panel
@@ -124,6 +132,21 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         panel.makeKeyAndOrderFront(nil)
         configurePanelShape(panel)
         panel.invalidateShadow()
+    }
+
+    /// 直前に記憶したパネルサイズがあればそれを、無ければ内容がフィットするサイズを返す
+    /// （UI_fix.md「メインUIのウィンドウサイズは可変にする（リサイズ結果を記憶する）」）。
+    private func resolvePanelContentSize(fittingSize: NSSize) -> NSSize {
+        guard let savedSize = AppSettingsResolver.resolvePanelWindowSize() else {
+            return NSSize(
+                width: DesignTokens.WindowSize.panelWidth,
+                height: max(fittingSize.height, DesignTokens.WindowSize.panelDefaultHeight)
+            )
+        }
+        return NSSize(
+            width: max(savedSize.width, DesignTokens.WindowSize.panelMinWidth),
+            height: max(savedSize.height, DesignTokens.WindowSize.panelMinHeight)
+        )
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -138,6 +161,14 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             return
         }
         closePanelIfNeeded(animated: true)
+    }
+
+    /// リサイズのたびにサイズを記憶する（UI_fix.md「リサイズ結果を記憶する」）。
+    func windowDidResize(_ notification: Notification) {
+        guard let panel = notification.object as? NSPanel else {
+            return
+        }
+        AppSettingsResolver.savePanelWindowSize(panel.frame.size)
     }
 
     // MARK: - 挿入
@@ -172,10 +203,34 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         }
     }
 
-    private func openEditorAndClose() {
+    private func openEditorAndClose(editingSnippetID: UUID?) {
         let target = currentTarget
         performActionAndClose { [weak self] in
-            self?.onOpenEditor?(target)
+            self?.onOpenEditor?(editingSnippetID, target)
+        }
+    }
+
+    /// スニペット行の右クリックメニューからの削除。パネルを閉じてからフォアグラウンドで
+    /// 確認ダイアログを出す（パネルは `.nonactivatingPanel` のため、開いたままでは
+    /// SwiftUI の `.alert` が安定して表示できない）。
+    private func confirmAndDeleteSnippet(_ snippet: Snippet) {
+        performActionAndClose { [weak self] in
+            guard let self else {
+                return
+            }
+            NSApp.activate(ignoringOtherApps: true)
+            let alert = NSAlert()
+            alert.alertStyle = .warning
+            alert.messageText = L10n.string("panel.deleteConfirm.title")
+            alert.informativeText = L10n.string("panel.deleteConfirm.message")
+            let deleteButton = alert.addButton(withTitle: L10n.string("editor.button.delete"))
+            deleteButton.hasDestructiveAction = true
+            let cancelButton = alert.addButton(withTitle: L10n.string("editor.button.cancel"))
+            cancelButton.keyEquivalent = "\u{1b}"
+            guard alert.runModal() == .alertFirstButtonReturn else {
+                return
+            }
+            self.store.deleteSnippet(id: snippet.id)
         }
     }
 

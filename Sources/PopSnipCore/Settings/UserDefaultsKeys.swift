@@ -38,6 +38,9 @@ public enum UserDefaultsKeys {
     public static let panelEnterKeyBehavior = "panel.enterKeyBehavior"
     public static let panelIsNumberKeySelectionEnabled = "panel.isNumberKeySelectionEnabled"
     public static let panelIsTagColorShown = "panel.isTagColorShown"
+    public static let panelFontSize = "panel.fontSize"
+    public static let panelWindowWidth = "panel.windowWidth"
+    public static let panelWindowHeight = "panel.windowHeight"
 
     // MARK: - スニペットストレージ
 

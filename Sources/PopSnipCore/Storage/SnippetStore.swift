@@ -84,6 +84,16 @@ public final class SnippetStore: ObservableObject {
         save()
     }
 
+    /// お気に入りの ON/OFF を切り替える。`upsertSnippet` と異なり `updatedAt` は更新しない
+    /// （お気に入り切り替えを「編集」として扱わないため）。
+    public func toggleFavorite(id: UUID) {
+        guard let index = library.snippets.firstIndex(where: { $0.id == id }) else {
+            return
+        }
+        library.snippets[index].isFavorite.toggle()
+        save()
+    }
+
     // MARK: - タグ CRUD
 
     public func upsertTag(_ tag: SnippetTag) {

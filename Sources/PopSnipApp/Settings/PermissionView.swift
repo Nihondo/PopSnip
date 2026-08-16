@@ -8,32 +8,30 @@ struct PermissionView: View {
     @State private var isGranted = AccessibilityPermission.isGranted()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
-            HStack(spacing: 8) {
-                Image(systemName: isGranted ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                    .foregroundStyle(isGranted ? .green : .orange)
-                Text(
-                    isGranted
-                        ? L10n.string("permission.status.granted")
-                        : L10n.string("permission.status.notGranted")
-                )
-                .font(.headline)
-            }
-
-            Text(L10n.string("permission.description"))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            HStack {
+        Form {
+            Section {
+                LabeledContent(L10n.string("permission.label.accessibility")) {
+                    HStack(spacing: 6) {
+                        Image(systemName: isGranted ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(isGranted ? .green : .orange)
+                        Text(
+                            isGranted
+                                ? L10n.string("permission.status.granted")
+                                : L10n.string("permission.status.notGranted")
+                        )
+                    }
+                }
                 Button(L10n.string("permission.button.openSettings")) {
                     openAccessibilitySettings()
                 }
                 Button(L10n.string("permission.button.refresh")) {
                     isGranted = AccessibilityPermission.isGranted()
                 }
+            } footer: {
+                Text(L10n.string("permission.description"))
             }
         }
-        .padding(DesignTokens.Spacing.large)
+        .formStyle(.grouped)
         .onAppear {
             isGranted = AccessibilityPermission.isGranted()
         }

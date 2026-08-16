@@ -19,8 +19,21 @@ enum DesignTokens {
     }
 
     enum WindowSize {
-        static let settingsMinWidth: CGFloat = 640
-        static let settingsMinHeight: CGFloat = 480
+        static let settingsMinWidth: CGFloat = 680
+        static let settingsMinHeight: CGFloat = 460
         static let panelWidth: CGFloat = 480
+        static let panelDefaultHeight: CGFloat = 420
+        static let panelMinWidth: CGFloat = 360
+        static let panelMinHeight: CGFloat = 220
+    }
+
+    /// パネル・スニペット一覧で使うベースの文字サイズ。
+    /// `AppFontSize.scale` を掛けて実際の表示サイズにする。
+    enum Typography {
+        static let rowTitle: CGFloat = 13
+        static let rowBody: CGFloat = 11
+        static let sectionHeader: CGFloat = 11
+        static let searchField: CGFloat = 16
+        static let indexHint: CGFloat = 10
     }
 }

@@ -42,21 +42,30 @@ struct GeneralSettingsView: View {
                 .onChange(of: preferences.clipboardRestoreDelayMs) { savePreferences() }
             }
 
-            Section(L10n.string("settings.general.storage")) {
-                HStack {
+            Section(L10n.string("settings.general.appearance")) {
+                Picker(L10n.string("settings.general.fontSize"), selection: $preferences.fontSize) {
+                    ForEach(AppFontSize.allCases, id: \.self) { fontSize in
+                        Text(L10n.string(fontSize.localizationKey)).tag(fontSize)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: preferences.fontSize) { savePreferences() }
+            }
+
+            Section {
+                LabeledContent(L10n.string("settings.general.storage")) {
                     Text(store.fileURL.path)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
-                    Spacer()
-                    Button(L10n.string("settings.general.revealInFinder")) {
-                        NSWorkspace.shared.activateFileViewerSelecting([store.fileURL])
-                    }
+                }
+                Button(L10n.string("settings.general.revealInFinder")) {
+                    NSWorkspace.shared.activateFileViewerSelecting([store.fileURL])
                 }
             }
         }
-        .padding(DesignTokens.Spacing.large)
+        .formStyle(.grouped)
     }
 
     private func updateLaunchAtLogin() {

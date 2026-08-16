@@ -33,7 +33,7 @@ final class SettingsWindowController: NSWindowController {
     }
 
     private func makeSettingsWindow() -> NSWindow {
-        let rootView = SettingsTabView(store: store, shortcutService: shortcutService)
+        let rootView = SettingsView(store: store, shortcutService: shortcutService)
         let hostingController = NSHostingController(rootView: rootView)
         let newWindow = NSWindow(contentViewController: hostingController)
         newWindow.title = L10n.string("window.settings.title")

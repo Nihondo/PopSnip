@@ -12,6 +12,8 @@ struct SnippetListWindowView: View {
     @State private var editingSnippetID: UUID?
     @State private var isShowingEditor = false
     @State private var isShowingBulkDeleteConfirmation = false
+    @State private var isShowingBulkTagPopover = false
+    @AppStorage(UserDefaultsKeys.panelFontSize) private var fontSize: AppFontSize = .medium
 
     var body: some View {
         NavigationSplitView {
@@ -28,6 +30,7 @@ struct SnippetListWindowView: View {
             }
         }
         .frame(minWidth: 760, minHeight: 520)
+        .environment(\.appFontSize, fontSize)
         .sheet(isPresented: $isShowingEditor) {
             SnippetEditorView(
                 store: store,
@@ -59,7 +62,7 @@ struct SnippetListWindowView: View {
             }
 
             if selection.isEmpty == false {
-                bulkTagMenu
+                bulkTagButton
                 Button(role: .destructive) {
                     isShowingBulkDeleteConfirmation = true
                 } label: {
@@ -72,18 +75,18 @@ struct SnippetListWindowView: View {
         .padding(DesignTokens.Spacing.medium)
     }
 
-    private var bulkTagMenu: some View {
-        Menu {
-            ForEach(store.library.tags) { tag in
-                Button(L10n.format("list.bulkTag.add", tag.name)) {
-                    applyTag(tag.id, add: true)
-                }
-                Button(L10n.format("list.bulkTag.remove", tag.name)) {
-                    applyTag(tag.id, add: false)
-                }
-            }
+    private var bulkTagButton: some View {
+        Button {
+            isShowingBulkTagPopover = true
         } label: {
             Label(L10n.string("list.bulkTag.menu"), systemImage: "tag")
+        }
+        .popover(isPresented: $isShowingBulkTagPopover) {
+            BulkTagPopoverView(
+                store: store,
+                selectedSnippetIDs: selection,
+                onApplyTag: applyTag(_:add:)
+            )
         }
     }
 
@@ -110,9 +113,9 @@ struct SnippetListWindowView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(snippet.displayTitle)
-                    .font(.system(size: 13, weight: .medium))
+                    .scaledFont(DesignTokens.Typography.rowTitle, weight: .medium)
                 Text(snippet.body)
-                    .font(.system(size: 11))
+                    .scaledFont(DesignTokens.Typography.rowBody)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 HStack(spacing: 4) {
@@ -125,8 +128,21 @@ struct SnippetListWindowView: View {
             Text("×\(snippet.usageCount)")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+            Button {
+                store.toggleFavorite(id: snippet.id)
+            } label: {
+                Image(systemName: snippet.isFavorite ? "star.fill" : "star")
+                    .foregroundStyle(snippet.isFavorite ? AnyShapeStyle(Color.yellow) : AnyShapeStyle(.tertiary))
+            }
+            .buttonStyle(.plain)
         }
+        // 行内の Text / TagChipView がヒットテストを吸ってしまい、空白部分のクリックで
+        // 選択できない不具合があった（UI_fix.md「空白をクリック選択しないとセル選択にならない」）。
+        // 行全体を単一のヒット領域にし、左右の余白も広げる。
+        .padding(.horizontal, 4)
         .padding(.vertical, 2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
         .onTapGesture(count: 2) {
             editingSnippetID = snippet.id
             isShowingEditor = true

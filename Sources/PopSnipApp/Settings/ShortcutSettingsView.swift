@@ -30,15 +30,10 @@ struct ShortcutSettingsView: View {
                             clear(action)
                         }
                     )
-                    if action != .showPanel {
-                        Text(L10n.string("settings.shortcut.reservedForFutureUse"))
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
                 }
             }
         }
-        .padding(DesignTokens.Spacing.large)
+        .formStyle(.grouped)
         .onAppear(perform: loadConfigurations)
     }
 
@@ -51,9 +46,8 @@ struct ShortcutSettingsView: View {
     private func apply(_ configuration: PanelShortcutConfiguration, for action: PopSnipShortcutAction) {
         configurations[action] = configuration
         PanelShortcutResolver.saveConfiguration(configuration, for: action)
-        if PopSnipShortcutAction.activeInMVP.contains(action) {
-            shortcutService.register(action, configuration: configuration)
-        }
+        shortcutService.register(action, configuration: configuration)
+        NotificationCenter.default.post(name: .popSnipShortcutsDidChange, object: nil)
     }
 
     private func clear(_ action: PopSnipShortcutAction) {
@@ -62,6 +56,7 @@ struct ShortcutSettingsView: View {
         UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.shortcutModifiers(action))
         UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.shortcutKeyCode(action))
         shortcutService.unregister(action)
+        NotificationCenter.default.post(name: .popSnipShortcutsDidChange, object: nil)
     }
 }
 

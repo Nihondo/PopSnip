@@ -24,6 +24,10 @@ final class SnippetEditorWindowController: NSWindowController {
 
     /// 編集画面を表示する。`editingSnippetID` が nil の場合は新規登録として開く。
     func showEditor(editingSnippetID: UUID?, initialBody: String) {
+        // 外部から snippets.json が編集されていた場合に反映してから開く
+        // （検索パネルの .onAppear と同じパターン。UI_fix.md 起点の監査で見つかった反映漏れの修正）。
+        store.reloadIfNeeded()
+
         let rootView = SnippetEditorView(
             store: store,
             editingSnippetID: editingSnippetID,

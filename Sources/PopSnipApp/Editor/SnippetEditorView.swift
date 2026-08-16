@@ -18,12 +18,22 @@ struct SnippetEditorView: View {
     @State private var bodyDraft = ""
     @State private var selectedTagIDs: Set<UUID> = []
     @State private var newTagName = ""
+    @State private var isFavorite = false
     @State private var isShowingDeleteConfirmation = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
-            Text(editingSnippetID == nil ? L10n.string("editor.title.new") : L10n.string("editor.title.edit"))
-                .font(.title3.bold())
+            HStack {
+                Text(editingSnippetID == nil ? L10n.string("editor.title.new") : L10n.string("editor.title.edit"))
+                    .font(.title3.bold())
+                Spacer()
+                Toggle(isOn: $isFavorite) {
+                    Label(L10n.string("editor.field.favorite"), systemImage: isFavorite ? "star.fill" : "star")
+                }
+                .toggleStyle(.button)
+                .labelStyle(.iconOnly)
+                .help(L10n.string("editor.field.favorite"))
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(L10n.string("editor.field.title"))
@@ -97,8 +107,10 @@ struct SnippetEditorView: View {
         }
     }
 
+    /// タグ一覧の間隔を詰めるため、固定幅グリッドではなく実際の文字幅で折り返す
+    /// TagFlowLayout を使う（UI_fix.md「スニペットの編集画面で、タグ一覧の間隔を詰める」）。
     private var tagPicker: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 6)], alignment: .leading, spacing: 6) {
+        TagFlowLayout(spacing: 4, lineSpacing: 4) {
             ForEach(store.library.tags) { tag in
                 Button {
                     toggleTag(tag.id)
@@ -144,6 +156,7 @@ struct SnippetEditorView: View {
         title = existingSnippet.title ?? ""
         bodyDraft = existingSnippet.body
         selectedTagIDs = Set(existingSnippet.tagIDs)
+        isFavorite = existingSnippet.isFavorite
     }
 
     private func save() {
@@ -156,7 +169,8 @@ struct SnippetEditorView: View {
             id: editingSnippetID ?? UUID(),
             title: trimmedTitle.isEmpty ? nil : trimmedTitle,
             body: trimmedBody,
-            tagIDs: Array(selectedTagIDs)
+            tagIDs: Array(selectedTagIDs),
+            isFavorite: isFavorite
         )
         store.upsertSnippet(snippet)
         onFinish()

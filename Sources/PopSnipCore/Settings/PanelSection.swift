@@ -18,8 +18,11 @@ public enum PanelSection: String, Codable, CaseIterable, Identifiable, Sendable 
 
     public var id: String { rawValue }
 
-    /// MVP で有効化される既定のセクション構成・順序。
-    public static let defaultOrder: [PanelSection] = [.tags, .recents, .allSnippets]
+    /// 既定のセクション構成・順序。新規インストール時はこの並びで表示される。
+    /// 既存インストールでは `AppSettingsResolver.resolvePanelPreferences()` が、永続化済みの
+    /// `sectionOrder` に無いケースをここから補って末尾へ追記する（新しいセクションを
+    /// 追加したときに、保存済み設定を持つ環境でも自動的に選択肢へ現れるようにするため）。
+    public static let defaultOrder: [PanelSection] = [.favorites, .tags, .recents, .allSnippets]
 
     public var localizationKey: String {
         switch self {

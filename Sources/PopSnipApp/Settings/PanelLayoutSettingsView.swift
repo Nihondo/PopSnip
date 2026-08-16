@@ -74,7 +74,7 @@ struct PanelLayoutSettingsView: View {
                     .onChange(of: preferences.isTagColorShown) { savePreferences() }
             }
         }
-        .padding(DesignTokens.Spacing.large)
+        .formStyle(.grouped)
     }
 
     private func bindingForSectionEnabled(_ section: PanelSection) -> Binding<Bool> {

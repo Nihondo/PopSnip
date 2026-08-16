@@ -16,16 +16,18 @@ import AppKit
 import SwiftUI
 
 private let panelCornerRadius: CGFloat = 16
-private let panelWidth: CGFloat = 480
 
 struct SnippetPanelView: View {
     @ObservedObject var store: SnippetStore
     @ObservedObject var viewModel: SnippetPanelViewModel
-    let onOpenEditor: () -> Void
+    let onOpenEditor: (_ editingSnippetID: UUID?) -> Void
     let onOpenList: () -> Void
     let onOpenSettings: () -> Void
+    let onDeleteSnippet: (Snippet) -> Void
     /// 生成された検索フィールドを Presenter へ引き渡す（キー操作は Presenter のキーモニタが担当する）。
     let onSearchFieldCreated: (NSTextField) -> Void
+
+    @Environment(\.appFontSize) private var appFontSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -35,7 +37,9 @@ struct SnippetPanelView: View {
             Divider().opacity(0.5)
             footer
         }
-        .frame(width: panelWidth)
+        // パネルはリサイズ可能なので、内容側で固定幅は指定しない（Presenter 側で
+        // ウインドウサイズを管理し、記憶したサイズをそのまま反映させる）。
+        .frame(minWidth: DesignTokens.WindowSize.panelMinWidth, minHeight: DesignTokens.WindowSize.panelMinHeight)
         .background(panelBackground)
         .clipShape(RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous))
         .overlay(
@@ -63,7 +67,7 @@ struct SnippetPanelView: View {
             IMESafeSearchField(
                 text: $viewModel.queryText,
                 placeholder: L10n.string("panel.search.placeholder"),
-                fontSize: 16,
+                fontSize: DesignTokens.Typography.searchField * appFontSize.scale,
                 onFieldCreated: onSearchFieldCreated
             )
             .frame(height: 22)
@@ -84,9 +88,10 @@ struct SnippetPanelView: View {
                         browsingContent
                     }
                 }
-                .padding(8)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 8)
             }
-            .frame(maxHeight: 320)
+            .frame(maxHeight: .infinity)
             // カーソルキーで選択が変わった際、選択行全体が見えるようにスクロールする。
             .onChange(of: viewModel.highlightedItemID) { _, highlightedItemID in
                 guard let highlightedItemID else {
@@ -146,9 +151,23 @@ struct SnippetPanelView: View {
                 }
             }
         case .allSnippets:
-            EmptyView()
+            let allSnippets = viewModel.allSnippets()
+            if allSnippets.isEmpty == false {
+                sectionHeader(L10n.string("panel.section.allSnippets"))
+                ForEach(allSnippets) { snippet in
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
+                        .id(PanelListItem.snippetItemID(snippet.id))
+                }
+            }
         case .favorites:
-            EmptyView()
+            let favoriteSnippets = viewModel.favoriteSnippets()
+            if favoriteSnippets.isEmpty == false {
+                sectionHeader(L10n.string("panel.section.favorites"))
+                ForEach(favoriteSnippets) { snippet in
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
+                        .id(PanelListItem.snippetItemID(snippet.id))
+                }
+            }
         }
     }
 
@@ -181,15 +200,17 @@ struct SnippetPanelView: View {
                 bodyHighlights: match.bodyHighlights,
                 isTagColorShown: viewModel.preferences.isTagColorShown,
                 isSelected: index == viewModel.highlightedIndex,
-                indexHint: viewModel.isSearching && viewModel.preferences.isNumberKeySelectionEnabled ? index + 1 : nil
+                indexHint: viewModel.isSearching && viewModel.preferences.isNumberKeySelectionEnabled ? index + 1 : nil,
+                onToggleFavorite: { viewModel.toggleFavorite(match.snippet.id) }
             )
             .onTapGesture { viewModel.selectByIndex(index) }
+            .snippetContextMenu(match.snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
         }
     }
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 11, weight: .semibold))
+            .font(appFontSize.font(DesignTokens.Typography.sectionHeader, weight: .semibold))
             .foregroundStyle(.tertiary)
             .padding(.horizontal, 4)
             .padding(.top, 6)
@@ -199,7 +220,7 @@ struct SnippetPanelView: View {
 
     private var footer: some View {
         HStack(spacing: 8) {
-            footerButton(titleKey: "panel.footer.register", systemImage: "plus", action: onOpenEditor)
+            footerButton(titleKey: "panel.footer.register", systemImage: "plus") { onOpenEditor(nil) }
             footerButton(titleKey: "panel.footer.list", systemImage: "list.bullet", action: onOpenList)
             Spacer()
             footerButton(titleKey: "panel.footer.settings", systemImage: "gearshape", action: onOpenSettings)
@@ -213,7 +234,7 @@ struct SnippetPanelView: View {
             Label(L10n.string(titleKey), systemImage: systemImage)
                 .font(.system(size: 11))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PanelFooterButtonStyle())
         .foregroundStyle(.secondary)
     }
 
@@ -240,8 +261,29 @@ struct SnippetPanelView: View {
             bodyHighlights: [],
             isTagColorShown: viewModel.preferences.isTagColorShown,
             isSelected: index == viewModel.highlightedIndex,
-            indexHint: nil
+            indexHint: nil,
+            onToggleFavorite: { viewModel.toggleFavorite(snippet.id) }
         )
         .onTapGesture { viewModel.selectByIndex(index) }
+        .snippetContextMenu(snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
+    }
+}
+
+private extension View {
+    /// スニペット行の右クリックメニュー（編集・削除）。
+    /// UI_fix.md「メインUI上のスニペットリストで、右クリックしたときに、スニペットの編集・削除ができるようにする」。
+    func snippetContextMenu(
+        _ snippet: Snippet,
+        onEdit: @escaping (_ editingSnippetID: UUID?) -> Void,
+        onDelete: @escaping (Snippet) -> Void
+    ) -> some View {
+        contextMenu {
+            Button(L10n.string("panel.row.edit")) {
+                onEdit(snippet.id)
+            }
+            Button(L10n.string("panel.row.delete"), role: .destructive) {
+                onDelete(snippet)
+            }
+        }
     }
 }

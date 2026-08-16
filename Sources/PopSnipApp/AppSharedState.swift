@@ -30,16 +30,24 @@ final class AppSharedState: NSObject {
         wireHandlers()
         registerShortcuts()
         logAccessibilityPermissionStateIfNeeded()
+        // Sparkle の updater を起動時から動かしておく（自動チェックの間隔を UserDefaults 通りに保つため）。
+        _ = AppUpdateController.shared
     }
 
     private func wireHandlers() {
         shortcutService.handlers[.showPanel] = { [weak self] in
             self?.panelPresenter.toggle()
         }
+        shortcutService.handlers[.showList] = { [weak self] in
+            self?.listWindowController.showList()
+        }
+        shortcutService.handlers[.quickRegister] = { [weak self] in
+            self?.handleQuickRegisterShortcut()
+        }
 
-        panelPresenter.onOpenEditor = { [weak self] target in
+        panelPresenter.onOpenEditor = { [weak self] editingSnippetID, target in
             self?.editorWindowController.showEditor(
-                editingSnippetID: nil,
+                editingSnippetID: editingSnippetID,
                 initialBody: target?.selectedText ?? ""
             )
         }
@@ -59,16 +67,62 @@ final class AppSharedState: NSObject {
         statusBarController.onOpenSettings = { [weak self] in
             self?.settingsWindowController.showSettingsWindow()
         }
+        statusBarController.onCheckForUpdates = {
+            AppUpdateController.shared.checkForUpdates()
+        }
+        statusBarController.onShowAbout = {
+            Self.showAboutPanel()
+        }
         statusBarController.onQuit = {
             NSApp.terminate(nil)
         }
     }
 
+    /// macOS 標準の About パネルを表示する（UI_fix.md「About画面を新規作成」への対応。
+    /// timeSlice と同じく独自ウインドウは作らず標準パネルを使う）。
+    private static func showAboutPanel() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: aboutPanelCredits])
+    }
+
+    private static var aboutPanelCredits: NSAttributedString {
+        let githubURLString = "https://github.com/Nihondo/PopSnip"
+        let creditsText = """
+        Copyright © 2026 Nihondo
+        GitHub: \(githubURLString)
+        """
+        let attributedCredits = NSMutableAttributedString(string: creditsText)
+        let githubURLRange = (creditsText as NSString).range(of: githubURLString)
+        if
+            githubURLRange.location != NSNotFound,
+            let githubURL = URL(string: githubURLString)
+        {
+            attributedCredits.addAttributes(
+                [
+                    .link: githubURL,
+                    .foregroundColor: NSColor.linkColor
+                ],
+                range: githubURLRange
+            )
+        }
+        return attributedCredits
+    }
+
     private func registerShortcuts() {
-        for action in PopSnipShortcutAction.activeInMVP {
+        for action in PopSnipShortcutAction.allCases {
             let configuration = AppSettingsResolver.resolveShortcutConfiguration(for: action)
             shortcutService.register(action, configuration: configuration)
         }
+    }
+
+    /// 選択範囲から即座にスニペット登録画面を開く（検索パネルは経由しない）。
+    private func handleQuickRegisterShortcut() {
+        guard AccessibilityPermission.isGranted() else {
+            AccessibilityPermission.requestIfNeeded()
+            return
+        }
+        let target = FocusSnapshotResolver.resolveCurrentTarget()
+        editorWindowController.showEditor(editingSnippetID: nil, initialBody: target?.selectedText ?? "")
     }
 
     private func logAccessibilityPermissionStateIfNeeded() {

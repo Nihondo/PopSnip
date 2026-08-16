@@ -21,6 +21,9 @@ final class SnippetListWindowController: NSWindowController {
     }
 
     func showList() {
+        // 外部から snippets.json が編集されていた場合に反映する
+        // （検索パネルの .onAppear と同じパターン。UI_fix.md 起点の監査で見つかった反映漏れの修正）。
+        store.reloadIfNeeded()
         if window == nil {
             window = makeWindow()
         }

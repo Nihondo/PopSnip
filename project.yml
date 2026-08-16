@@ -21,6 +21,11 @@ configFiles:
   Debug: Configurations/DevelopmentTeam.xcconfig
   Release: Configurations/DevelopmentTeam.xcconfig
 
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    majorVersion: 2.9.1
+
 targets:
   PopSnip:
     type: application
@@ -32,6 +37,8 @@ targets:
         buildPhase: resources
         excludes:
           - "Info.plist"
+    dependencies:
+      - package: Sparkle
     settings:
       base:
         PRODUCT_NAME: PopSnip

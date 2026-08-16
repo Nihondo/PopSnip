@@ -48,6 +48,7 @@ public struct PanelPreferences: Equatable, Sendable {
     public var isNumberKeySelectionEnabled: Bool
     public var isTagColorShown: Bool
     public var clipboardRestoreDelayMs: Int
+    public var fontSize: AppFontSize
 
     public init(
         sectionOrder: [PanelSection] = PanelSection.defaultOrder,
@@ -61,7 +62,8 @@ public struct PanelPreferences: Equatable, Sendable {
         enterKeyBehavior: EnterKeyBehavior = .insert,
         isNumberKeySelectionEnabled: Bool = true,
         isTagColorShown: Bool = true,
-        clipboardRestoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs
+        clipboardRestoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs,
+        fontSize: AppFontSize = .medium
     ) {
         self.sectionOrder = sectionOrder
         self.enabledSections = enabledSections
@@ -75,6 +77,7 @@ public struct PanelPreferences: Equatable, Sendable {
         self.isNumberKeySelectionEnabled = isNumberKeySelectionEnabled
         self.isTagColorShown = isTagColorShown
         self.clipboardRestoreDelayMs = clipboardRestoreDelayMs
+        self.fontSize = fontSize
     }
 
     /// 既定値のみのプリファレンス（設定 UI 実装前の MVP 段階で使用）。
