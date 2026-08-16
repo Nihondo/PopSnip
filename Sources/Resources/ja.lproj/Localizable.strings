@@ -75,6 +75,9 @@
 "settings.panel.searchSortOrder.relevance" = "関連度";
 "settings.panel.searchSortOrder.usageCount" = "使用回数";
 "settings.panel.searchSortOrder.updatedAt" = "更新日時";
+"settings.panel.tagSortOrder" = "タグの並び順";
+"settings.panel.tagSortOrder.registrationOrder" = "登録順";
+"settings.panel.tagSortOrder.snippetCountDescending" = "一致件数の多い順";
 "settings.panel.presentationPosition" = "パネルの表示位置";
 "settings.panel.presentationPosition.mouse" = "マウス位置";
 "settings.panel.presentationPosition.center" = "画面中央";

@@ -26,6 +26,14 @@ public enum EnterKeyBehavior: String, Codable, CaseIterable, Sendable {
     case copyOnly
 }
 
+/// タグ一覧・ドリルダウン中のサブタグ候補の並び順。
+public enum TagSortOrder: String, Codable, CaseIterable, Sendable {
+    /// タグ登録順（`store.library.tags` の順序）。
+    case registrationOrder
+    /// 一致件数の多い順。
+    case snippetCountDescending
+}
+
 /// パネルの表示・操作に関する設定。
 public struct PanelPreferences: Equatable, Sendable {
     public var sectionOrder: [PanelSection]
@@ -33,6 +41,7 @@ public struct PanelPreferences: Equatable, Sendable {
     public var recentsLimit: Int
     public var searchResultLimit: Int
     public var searchSortOrder: SearchSortOrder
+    public var tagSortOrder: TagSortOrder
     public var presentationPosition: PanelPosition
     public var insertionStrategy: InsertionStrategy
     public var enterKeyBehavior: EnterKeyBehavior
@@ -46,6 +55,7 @@ public struct PanelPreferences: Equatable, Sendable {
         recentsLimit: Int = 8,
         searchResultLimit: Int = 20,
         searchSortOrder: SearchSortOrder = .relevance,
+        tagSortOrder: TagSortOrder = .registrationOrder,
         presentationPosition: PanelPosition = .mouseLocation,
         insertionStrategy: InsertionStrategy = .automatic,
         enterKeyBehavior: EnterKeyBehavior = .insert,
@@ -58,6 +68,7 @@ public struct PanelPreferences: Equatable, Sendable {
         self.recentsLimit = recentsLimit
         self.searchResultLimit = searchResultLimit
         self.searchSortOrder = searchSortOrder
+        self.tagSortOrder = tagSortOrder
         self.presentationPosition = presentationPosition
         self.insertionStrategy = insertionStrategy
         self.enterKeyBehavior = enterKeyBehavior

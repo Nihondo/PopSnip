@@ -134,10 +134,12 @@ struct TagRowView: View {
     }
 }
 
-/// タグドリルダウン中の「< タグ名」行。クリックだけでなくカーソルキーでも選択できる
-/// （一覧の先頭項目として扱われる）。
+/// タグドリルダウン中の「< タグ1 タグ2 ...」行（パンくず）。クリックだけでなく
+/// カーソルキーでも選択できる（一覧の先頭項目として扱われる）。選択すると1段階だけ戻る。
+/// パンくずの各タグチップは非クリック（表示のみ）で、行全体のクリック / Enter が
+/// 「1段階戻る」の唯一の操作。
 struct BackRowView: View {
-    let tag: SnippetTag
+    let tags: [SnippetTag]
     let isSelected: Bool
 
     var body: some View {
@@ -145,7 +147,11 @@ struct BackRowView: View {
             Image(systemName: "chevron.left")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
-            TagChipView(tag: tag)
+            HStack(spacing: 4) {
+                ForEach(tags) { tag in
+                    TagChipView(tag: tag)
+                }
+            }
             Spacer()
         }
         .padding(.horizontal, 10)

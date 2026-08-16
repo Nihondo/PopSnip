@@ -46,6 +46,12 @@ struct PanelLayoutSettingsView: View {
                 }
                 .onChange(of: preferences.searchSortOrder) { savePreferences() }
 
+                Picker(L10n.string("settings.panel.tagSortOrder"), selection: $preferences.tagSortOrder) {
+                    Text(L10n.string("settings.panel.tagSortOrder.registrationOrder")).tag(TagSortOrder.registrationOrder)
+                    Text(L10n.string("settings.panel.tagSortOrder.snippetCountDescending")).tag(TagSortOrder.snippetCountDescending)
+                }
+                .onChange(of: preferences.tagSortOrder) { savePreferences() }
+
                 Picker(L10n.string("settings.panel.presentationPosition"), selection: $preferences.presentationPosition) {
                     Text(L10n.string("settings.panel.presentationPosition.mouse")).tag(PanelPosition.mouseLocation)
                     Text(L10n.string("settings.panel.presentationPosition.center")).tag(PanelPosition.screenCenter)

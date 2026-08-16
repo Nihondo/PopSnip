@@ -75,6 +75,9 @@
 "settings.panel.searchSortOrder.relevance" = "Relevance";
 "settings.panel.searchSortOrder.usageCount" = "Usage Count";
 "settings.panel.searchSortOrder.updatedAt" = "Last Updated";
+"settings.panel.tagSortOrder" = "Tag Order";
+"settings.panel.tagSortOrder.registrationOrder" = "Registration Order";
+"settings.panel.tagSortOrder.snippetCountDescending" = "Most Matches First";
 "settings.panel.presentationPosition" = "Panel Position";
 "settings.panel.presentationPosition.mouse" = "Mouse Location";
 "settings.panel.presentationPosition.center" = "Screen Center";

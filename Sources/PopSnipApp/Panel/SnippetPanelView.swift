@@ -49,7 +49,7 @@ struct SnippetPanelView: View {
         .onChange(of: viewModel.queryText) { _, _ in
             viewModel.resetHighlightForQueryChange()
         }
-        .onChange(of: viewModel.selectedTagID) { _, _ in
+        .onChange(of: viewModel.selectedTagIDs) { _, _ in
             viewModel.resetHighlightForQueryChange()
         }
     }
@@ -97,7 +97,7 @@ struct SnippetPanelView: View {
     /// listItems の enumerated() を唯一の情報源にすることで、内容とインデックスが常に一致する。
     @ViewBuilder
     private var browsingContent: some View {
-        if viewModel.selectedTagID != nil {
+        if viewModel.isDrilledDown {
             ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
                 row(for: item, at: index)
             }
@@ -120,7 +120,7 @@ struct SnippetPanelView: View {
                         snippetCount: viewModel.snippetCount(for: tag.id),
                         isSelected: viewModel.indexOfTagRow(tag.id) == viewModel.highlightedIndex
                     )
-                    .onTapGesture { viewModel.selectTag(tag.id) }
+                    .onTapGesture { viewModel.drillIntoTag(tag.id) }
                 }
             }
         case .recents:
@@ -149,17 +149,15 @@ struct SnippetPanelView: View {
     private func row(for item: PanelListItem, at index: Int) -> some View {
         switch item {
         case .backToParent:
-            if let selectedTagID = viewModel.selectedTagID, let tag = store.library.tags.first(where: { $0.id == selectedTagID }) {
-                BackRowView(tag: tag, isSelected: index == viewModel.highlightedIndex)
-                    .onTapGesture { viewModel.clearDrillDown() }
-            }
+            BackRowView(tags: viewModel.selectedTags, isSelected: index == viewModel.highlightedIndex)
+                .onTapGesture { viewModel.goBackOneLevel() }
         case .tag(let tag, let count):
             TagRowView(
                 tag: tag,
                 snippetCount: count,
                 isSelected: index == viewModel.highlightedIndex
             )
-            .onTapGesture { viewModel.selectTag(tag.id) }
+            .onTapGesture { viewModel.drillIntoTag(tag.id) }
         case .snippet(let match):
             SnippetRowView(
                 snippet: match.snippet,

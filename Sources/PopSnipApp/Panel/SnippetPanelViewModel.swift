@@ -2,12 +2,20 @@
 // 検索パネルの選択状態（検索語・タグドリルダウン・ハイライト行）とキー操作を集約する。
 // IMESafeSearchField（doCommandBy 経由）と SnippetPanelPresenter（⌘1〜⌘9 の直接選択）の
 // 両方から同じ経路でキー操作を発火できるよう、View から状態を切り出したもの。
+//
+// タグドリルダウンは複数段掘り下げられる（selectedTagIDs は選択順のパンくず）。
+// AND 絞り込みされたスニペット群に含まれる「他のタグ」もサブ候補として提示することで、
+// 複数タグを持つスニペットをタグを重ねて絞り込んでいける。
+// ループ防止: サブ候補は「現在の絞り込み結果に含まれるタグ − 既に選択済みのタグ」として
+// 計算するため、選択済みのタグは構造的に候補から除外され、同じタグを再選択できない。
+// selectedTagIDs は選択のたびに末尾へ追加されるだけで単調増加し、上限はライブラリ内の
+// 総タグ数という有限値のため、この操作列は必ず停止する。
 
 import Foundation
 
 /// 検索パネル内で選択可能な1項目。
 enum PanelListItem: Identifiable {
-    /// タグドリルダウン中の「< タグ名」行。クリックだけでなくカーソルキーでも選択できる。
+    /// タグドリルダウン中の「< タグ名, タグ名, ...」行。クリックだけでなくカーソルキーでも選択できる。
     case backToParent
     case tag(SnippetTag, snippetCount: Int)
     case snippet(SnippetSearchMatch)
@@ -27,7 +35,8 @@ enum PanelListItem: Identifiable {
 @MainActor
 final class SnippetPanelViewModel: ObservableObject {
     @Published var queryText = ""
-    @Published var selectedTagID: UUID?
+    /// ドリルダウンのパンくず。選択順に末尾へ追加される。空ならトップレベル表示。
+    @Published var selectedTagIDs: [UUID] = []
     @Published var highlightedIndex = 0
 
     let store: SnippetStore
@@ -51,6 +60,10 @@ final class SnippetPanelViewModel: ObservableObject {
         queryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
 
+    var isDrilledDown: Bool {
+        selectedTagIDs.isEmpty == false
+    }
+
     var searchMatches: [SnippetSearchMatch] {
         SnippetSearchEngine.search(
             query: queryText,
@@ -61,15 +74,27 @@ final class SnippetPanelViewModel: ObservableObject {
         )
     }
 
+    /// ドリルダウンのパンくず表示用。選択順を維持したまま `SnippetTag` を解決する。
+    var selectedTags: [SnippetTag] {
+        selectedTagIDs.compactMap { tagID in
+            store.library.tags.first { $0.id == tagID }
+        }
+    }
+
     /// 現在表示されている項目一覧。キー操作のインデックス解決に使う。
     var listItems: [PanelListItem] {
         if isSearching {
             return searchMatches.map { .snippet($0) }
         }
 
-        if let selectedTagID {
+        if isDrilledDown {
+            let filteredSnippets = snippetsForSelectedTags(selectedTagIDs)
             var items: [PanelListItem] = [.backToParent]
-            items.append(contentsOf: snippetsForSelectedTag(selectedTagID).map { .snippet(emptyMatch(for: $0)) })
+            items.append(
+                contentsOf: subTagCandidates(in: filteredSnippets, excluding: selectedTagIDs)
+                    .map { .tag($0.tag, snippetCount: $0.count) }
+            )
+            items.append(contentsOf: filteredSnippets.map { .snippet(emptyMatch(for: $0)) })
             return items
         }
 
@@ -77,7 +102,13 @@ final class SnippetPanelViewModel: ObservableObject {
         for section in preferences.orderedEnabledSections {
             switch section {
             case .tags:
-                items.append(contentsOf: store.library.tags.map { .tag($0, snippetCount: snippetCount(for: $0.id)) })
+                let globalCounts = Dictionary(
+                    uniqueKeysWithValues: store.library.tags.map { ($0.id, snippetCount(for: $0.id)) }
+                )
+                items.append(
+                    contentsOf: orderedTags(store.library.tags, counts: globalCounts)
+                        .map { .tag($0, snippetCount: globalCounts[$0.id] ?? 0) }
+                )
             case .recents:
                 items.append(contentsOf: recentSnippets().map { .snippet(emptyMatch(for: $0)) })
             case .allSnippets, .favorites:
@@ -109,14 +140,15 @@ final class SnippetPanelViewModel: ObservableObject {
         }
     }
 
-    /// 検索ボックスが空の状態で Backspace が押された場合のみタグドリルダウンを解除する
-    /// （PopSnip_UI_plan.md「タグドリルダウンは...Backspace で解除」）。
-    /// - Returns: ドリルダウンを解除した場合は true（デフォルトの文字削除を抑止する）。
+    /// 検索ボックスが空の状態で Backspace が押された場合、ドリルダウンを1段階だけ解除する
+    /// （PopSnip_UI_plan.md「タグドリルダウンは...Backspace で解除」。複数段掘っている場合は
+    /// 一気に最上位へ戻さず、直前の段階へ1つずつ戻す）。
+    /// - Returns: 1段階戻した場合は true（デフォルトの文字削除を抑止する）。
     func handleBackspaceForDrillDownIfNeeded() -> Bool {
-        guard queryText.isEmpty, selectedTagID != nil else {
+        guard queryText.isEmpty, isDrilledDown else {
             return false
         }
-        clearDrillDown()
+        goBackOneLevel()
         return true
     }
 
@@ -142,13 +174,23 @@ final class SnippetPanelViewModel: ObservableObject {
         confirm(listItems[index])
     }
 
-    func selectTag(_ tagID: UUID) {
-        selectedTagID = tagID
+    /// タグを1段階掘り下げる。トップレベルでの初回選択・ドリルダウン中のサブ候補選択の
+    /// どちらもこの1つの関数で扱える（前者は空配列への追加として自然に扱われる）。
+    /// 既に選択済みのタグは無視する（ループ防止・重複防止）。
+    func drillIntoTag(_ tagID: UUID) {
+        guard selectedTagIDs.contains(tagID) == false else {
+            return
+        }
+        selectedTagIDs.append(tagID)
         highlightedIndex = 0
     }
 
-    func clearDrillDown() {
-        selectedTagID = nil
+    /// ドリルダウンを1段階だけ戻す。
+    func goBackOneLevel() {
+        guard selectedTagIDs.isEmpty == false else {
+            return
+        }
+        selectedTagIDs.removeLast()
         highlightedIndex = 0
     }
 
@@ -159,9 +201,9 @@ final class SnippetPanelViewModel: ObservableObject {
     private func confirm(_ item: PanelListItem) {
         switch item {
         case .backToParent:
-            clearDrillDown()
+            goBackOneLevel()
         case .tag(let tag, _):
-            selectTag(tag.id)
+            drillIntoTag(tag.id)
         case .snippet(let match):
             onSelectSnippet(match.snippet)
         }
@@ -173,8 +215,33 @@ final class SnippetPanelViewModel: ObservableObject {
         store.library.tags.filter { snippet.tagIDs.contains($0.id) }
     }
 
-    func snippetsForSelectedTag(_ tagID: UUID) -> [Snippet] {
-        store.library.snippets.filter { $0.tagIDs.contains(tagID) }
+    /// `tagIDs` すべてを持つスニペット（AND 絞り込み）。`tagIDs` が空なら空配列を返す。
+    func snippetsForSelectedTags(_ tagIDs: [UUID]) -> [Snippet] {
+        guard tagIDs.isEmpty == false else {
+            return []
+        }
+        return store.library.snippets.filter { snippet in
+            tagIDs.allSatisfy { snippet.tagIDs.contains($0) }
+        }
+    }
+
+    /// `snippets` に含まれるタグを集計し、`excludedTagIDs` に含まれるものを除外して返す
+    /// （ループ防止: 既に選択済みのタグを候補から構造的に取り除く）。
+    /// カウントは `snippets` の中での一致件数。
+    func subTagCandidates(
+        in snippets: [Snippet],
+        excluding excludedTagIDs: [UUID]
+    ) -> [(tag: SnippetTag, count: Int)] {
+        var countsByTagID: [UUID: Int] = [:]
+        for snippet in snippets {
+            for tagID in snippet.tagIDs where excludedTagIDs.contains(tagID) == false {
+                countsByTagID[tagID, default: 0] += 1
+            }
+        }
+        let candidateTags = store.library.tags.filter { countsByTagID[$0.id] != nil }
+        return orderedTags(candidateTags, counts: countsByTagID).map { tag in
+            (tag: tag, count: countsByTagID[tag.id] ?? 0)
+        }
     }
 
     func snippetCount(for tagID: UUID) -> Int {
@@ -201,6 +268,19 @@ final class SnippetPanelViewModel: ObservableObject {
 
     func indexOfTagRow(_ tagID: UUID) -> Int {
         listItems.firstIndex { $0.id == "tag-\(tagID.uuidString)" } ?? 0
+    }
+
+    /// `preferences.tagSortOrder` に従ってタグを並び替える。
+    /// `.registrationOrder` は `tags` の受け取り順（= `store.library.tags` の順序）をそのまま維持し、
+    /// `.snippetCountDescending` は `counts`（呼び出し元が渡す一致件数。トップレベルではライブラリ全体、
+    /// サブ候補では現在の絞り込み結果内での件数）の多い順（同数は登録順を維持、`sorted` は安定ソート）。
+    private func orderedTags(_ tags: [SnippetTag], counts: [UUID: Int]) -> [SnippetTag] {
+        switch preferences.tagSortOrder {
+        case .registrationOrder:
+            return tags
+        case .snippetCountDescending:
+            return tags.sorted { (counts[$0.id] ?? 0) > (counts[$1.id] ?? 0) }
+        }
     }
 
     private func emptyMatch(for snippet: Snippet) -> SnippetSearchMatch {
