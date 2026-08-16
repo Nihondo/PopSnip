@@ -204,13 +204,27 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             return
         }
 
+        // NSAnimationContext.runAnimationGroup の completionHandler は @escaping なため、
+        // Swift 6 の厳格な並行性チェックでは @Sendable クロージャとして扱われる。実際には
+        // AppKit がこのハンドラをメインスレッド上でのみ呼び出すことが保証されているが、
+        // コンパイラはそれを静的に知らないため、以下の2点で明示的に安全性を主張する:
+        //   1. completion クロージャは非 Sendable なため、nonisolated(unsafe) を付けた
+        //      ローカル定数として捕捉する（SnippetPanel は MainActor 隔離クラスとして
+        //      すでに Sendable 扱いのため、こちらには不要）
+        //   2. ハンドラ本体は MainActor.assumeIsolated で実行し、MainActor 隔離のメンバ
+        //      （close() / alphaValue）へ同期的にアクセスできるようにする
+        let panelToClose = activePanel
+        nonisolated(unsafe) let completionToRun = completion
+
         NSAnimationContext.runAnimationGroup { context in
             context.duration = closeAnimationDuration
             activePanel.animator().alphaValue = 0
         } completionHandler: {
-            activePanel.close()
-            activePanel.alphaValue = 1
-            completion?()
+            MainActor.assumeIsolated {
+                panelToClose.close()
+                panelToClose.alphaValue = 1
+                completionToRun?()
+            }
         }
     }
 

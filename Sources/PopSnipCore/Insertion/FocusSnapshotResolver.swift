@@ -49,7 +49,7 @@ public enum FocusSnapshotResolver {
         else {
             return nil
         }
-        return unsafeBitCast(focusedElementValue, to: AXUIElement.self)
+        return unsafeDowncast(focusedElementValue, to: AXUIElement.self)
     }
 
     // MARK: - 選択テキスト
