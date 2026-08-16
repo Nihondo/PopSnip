@@ -1,0 +1,59 @@
+name: PopSnip
+options:
+  bundleIdPrefix: com.dmng.popsnip
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    GENERATE_INFOPLIST_FILE: NO
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_ENTITLEMENTS: PopSnip.entitlements
+
+configFiles:
+  Debug: Configurations/DevelopmentTeam.xcconfig
+  Release: Configurations/DevelopmentTeam.xcconfig
+
+targets:
+  PopSnip:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/PopSnipApp
+      - path: Sources/PopSnipCore
+      - path: Sources/Resources
+        buildPhase: resources
+        excludes:
+          - "Info.plist"
+    settings:
+      base:
+        PRODUCT_NAME: PopSnip
+        PRODUCT_BUNDLE_IDENTIFIER: com.dmng.popsnip.PopSnip
+        INFOPLIST_FILE: Sources/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+    scheme:
+      testTargets:
+        - PopSnipTests
+      gatherCoverageData: true
+
+  PopSnipTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: PopSnipTests
+    dependencies:
+      - target: PopSnip
+    settings:
+      base:
+        PRODUCT_NAME: PopSnipTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.dmng.popsnip.PopSnipTests
+        GENERATE_INFOPLIST_FILE: YES

@@ -1,0 +1,101 @@
+/* ウインドウタイトル */
+"window.settings.title" = "PopSnip 設定";
+"window.editor.title" = "スニペット";
+"window.list.title" = "スニペット一覧";
+
+/* メニューバー */
+"menu.showPanel" = "検索パネルを開く";
+"menu.openList" = "スニペット一覧...";
+"menu.openSettings" = "設定...";
+"menu.quit" = "PopSnip を終了";
+
+/* パネル */
+"panel.search.placeholder" = "スニペットを検索...";
+"panel.section.favorites" = "お気に入り";
+"panel.section.tags" = "タグ";
+"panel.section.recents" = "最近使用したスニペット";
+"panel.section.allSnippets" = "すべてのスニペット";
+"panel.footer.register" = "登録";
+"panel.footer.list" = "一覧";
+"panel.footer.settings" = "設定";
+
+/* 登録・編集 */
+"editor.title.new" = "新規スニペット";
+"editor.title.edit" = "スニペットを編集";
+"editor.field.title" = "タイトル（省略可）";
+"editor.field.title.placeholder" = "タイトル";
+"editor.field.body" = "本文";
+"editor.field.tags" = "タグ";
+"editor.field.newTag.placeholder" = "新しいタグ名";
+"editor.button.addTag" = "追加";
+"editor.button.cancel" = "キャンセル";
+"editor.button.save" = "保存";
+"editor.button.delete" = "削除";
+"editor.deleteConfirm.title" = "このスニペットを削除しますか？";
+"editor.deleteConfirm.message" = "この操作は取り消せません。";
+
+/* タグ管理 */
+"tagManager.title" = "タグ";
+"tagManager.empty" = "タグはまだありません。";
+"tagManager.deleteConfirm.title" = "このタグを削除しますか？";
+"tagManager.deleteConfirm.message" = "「%@」がすべてのスニペットから削除されます。";
+
+/* 一覧編集 */
+"list.filter.placeholder" = "絞り込み...";
+"list.row.edit" = "編集";
+"list.bulkTag.menu" = "タグ";
+"list.bulkTag.add" = "「%@」を付与";
+"list.bulkTag.remove" = "「%@」を削除";
+"list.bulkDeleteConfirm.title" = "選択したスニペットを削除しますか？";
+
+/* 設定タブ */
+"settings.tab.general" = "一般";
+"settings.tab.panel" = "パネル表示";
+"settings.tab.shortcut" = "ショートカット";
+"settings.tab.permission" = "権限";
+
+/* 設定: 一般 */
+"settings.general.launchAtLogin" = "ログイン時に起動";
+"settings.general.insertion" = "挿入";
+"settings.general.insertionStrategy" = "挿入方式";
+"settings.general.insertionStrategy.automatic" = "自動（Accessibility → Clipboard）";
+"settings.general.insertionStrategy.accessibilityOnly" = "Accessibility API のみ";
+"settings.general.insertionStrategy.clipboardOnly" = "Clipboard + Cmd+V のみ";
+"settings.general.clipboardRestoreDelay" = "クリップボード復元待機時間: %d ms";
+"settings.general.storage" = "保存先";
+"settings.general.revealInFinder" = "Finder で表示";
+
+/* 設定: パネル表示 */
+"settings.panel.sections" = "セクション（ドラッグで並び替え）";
+"settings.panel.counts" = "表示件数";
+"settings.panel.recentsLimit" = "最近使用の表示件数: %d";
+"settings.panel.searchResultLimit" = "検索結果の表示件数: %d";
+"settings.panel.behavior" = "動作";
+"settings.panel.searchSortOrder" = "検索結果の並び順";
+"settings.panel.searchSortOrder.relevance" = "関連度";
+"settings.panel.searchSortOrder.usageCount" = "使用回数";
+"settings.panel.searchSortOrder.updatedAt" = "更新日時";
+"settings.panel.presentationPosition" = "パネルの表示位置";
+"settings.panel.presentationPosition.mouse" = "マウス位置";
+"settings.panel.presentationPosition.center" = "画面中央";
+"settings.panel.enterKeyBehavior" = "Enter キーの動作";
+"settings.panel.enterKeyBehavior.insert" = "挿入する";
+"settings.panel.enterKeyBehavior.copyOnly" = "クリップボードへコピーのみ";
+"settings.panel.numberKeySelection" = "⌘1〜⌘9 での直接選択を有効化";
+"settings.panel.tagColor" = "タグの色を表示";
+
+/* 設定: ショートカット */
+"shortcut.action.showPanel" = "検索パネルを開く";
+"shortcut.action.quickRegister" = "選択範囲から即座に登録";
+"shortcut.action.showList" = "スニペット一覧を開く";
+"settings.shortcut.unassigned" = "未設定";
+"settings.shortcut.recording" = "キーを押してください...";
+"settings.shortcut.clear" = "クリア";
+"settings.shortcut.reservedForFutureUse" = "将来のバージョンのために予約されています。";
+
+/* 権限 */
+"permission.status.granted" = "アクセシビリティ権限が許可されています";
+"permission.status.notGranted" = "アクセシビリティ権限が必要です";
+"permission.description" = "PopSnip が他のアプリのフォーカス中の入力欄へスニペットを挿入するには、アクセシビリティ権限が必要です。";
+"permission.button.openSettings" = "システム設定を開く";
+"permission.button.refresh" = "状態を再確認";

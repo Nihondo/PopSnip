@@ -1,0 +1,101 @@
+/* Window titles */
+"window.settings.title" = "PopSnip Settings";
+"window.editor.title" = "Snippet";
+"window.list.title" = "Snippet List";
+
+/* Menu bar */
+"menu.showPanel" = "Show Search Panel";
+"menu.openList" = "Snippet List...";
+"menu.openSettings" = "Settings...";
+"menu.quit" = "Quit PopSnip";
+
+/* Panel */
+"panel.search.placeholder" = "Search snippets...";
+"panel.section.favorites" = "Favorites";
+"panel.section.tags" = "Tags";
+"panel.section.recents" = "Recently Used";
+"panel.section.allSnippets" = "All Snippets";
+"panel.footer.register" = "Register";
+"panel.footer.list" = "List";
+"panel.footer.settings" = "Settings";
+
+/* Editor */
+"editor.title.new" = "New Snippet";
+"editor.title.edit" = "Edit Snippet";
+"editor.field.title" = "Title (optional)";
+"editor.field.title.placeholder" = "Title";
+"editor.field.body" = "Body";
+"editor.field.tags" = "Tags";
+"editor.field.newTag.placeholder" = "New tag name";
+"editor.button.addTag" = "Add";
+"editor.button.cancel" = "Cancel";
+"editor.button.save" = "Save";
+"editor.button.delete" = "Delete";
+"editor.deleteConfirm.title" = "Delete this snippet?";
+"editor.deleteConfirm.message" = "This action cannot be undone.";
+
+/* Tag manager */
+"tagManager.title" = "Tags";
+"tagManager.empty" = "No tags yet.";
+"tagManager.deleteConfirm.title" = "Delete this tag?";
+"tagManager.deleteConfirm.message" = "\"%@\" will be removed from all snippets.";
+
+/* List window */
+"list.filter.placeholder" = "Filter...";
+"list.row.edit" = "Edit";
+"list.bulkTag.menu" = "Tags";
+"list.bulkTag.add" = "Add \"%@\"";
+"list.bulkTag.remove" = "Remove \"%@\"";
+"list.bulkDeleteConfirm.title" = "Delete the selected snippets?";
+
+/* Settings: tabs */
+"settings.tab.general" = "General";
+"settings.tab.panel" = "Panel";
+"settings.tab.shortcut" = "Shortcut";
+"settings.tab.permission" = "Permission";
+
+/* Settings: general */
+"settings.general.launchAtLogin" = "Launch at Login";
+"settings.general.insertion" = "Insertion";
+"settings.general.insertionStrategy" = "Insertion Method";
+"settings.general.insertionStrategy.automatic" = "Automatic (Accessibility → Clipboard)";
+"settings.general.insertionStrategy.accessibilityOnly" = "Accessibility API Only";
+"settings.general.insertionStrategy.clipboardOnly" = "Clipboard + Cmd+V Only";
+"settings.general.clipboardRestoreDelay" = "Clipboard Restore Delay: %d ms";
+"settings.general.storage" = "Storage";
+"settings.general.revealInFinder" = "Reveal in Finder";
+
+/* Settings: panel layout */
+"settings.panel.sections" = "Sections (drag to reorder)";
+"settings.panel.counts" = "Counts";
+"settings.panel.recentsLimit" = "Recent Items: %d";
+"settings.panel.searchResultLimit" = "Search Results: %d";
+"settings.panel.behavior" = "Behavior";
+"settings.panel.searchSortOrder" = "Sort Order";
+"settings.panel.searchSortOrder.relevance" = "Relevance";
+"settings.panel.searchSortOrder.usageCount" = "Usage Count";
+"settings.panel.searchSortOrder.updatedAt" = "Last Updated";
+"settings.panel.presentationPosition" = "Panel Position";
+"settings.panel.presentationPosition.mouse" = "Mouse Location";
+"settings.panel.presentationPosition.center" = "Screen Center";
+"settings.panel.enterKeyBehavior" = "Enter Key";
+"settings.panel.enterKeyBehavior.insert" = "Insert";
+"settings.panel.enterKeyBehavior.copyOnly" = "Copy to Clipboard Only";
+"settings.panel.numberKeySelection" = "Enable ⌘1–⌘9 Direct Selection";
+"settings.panel.tagColor" = "Show Tag Colors";
+
+/* Settings: shortcut */
+"shortcut.action.showPanel" = "Show Search Panel";
+"shortcut.action.quickRegister" = "Quick Register from Selection";
+"shortcut.action.showList" = "Open Snippet List";
+"settings.shortcut.unassigned" = "Not Set";
+"settings.shortcut.recording" = "Press keys...";
+"settings.shortcut.clear" = "Clear";
+"settings.shortcut.reservedForFutureUse" = "Reserved for a future version.";
+
+/* Permission */
+"permission.status.granted" = "Accessibility access granted";
+"permission.status.notGranted" = "Accessibility access required";
+"permission.description" = "PopSnip needs Accessibility permission to insert snippets into the focused text field of other apps.";
+"permission.button.openSettings" = "Open System Settings";
+"permission.button.refresh" = "Refresh Status";

@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+DerivedData/
+.xcode-derived/
+build/
+*.xcuserstate
+*.xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.xcscmblueprint
+*.xccheckout
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+Configurations/DevelopmentTeam.local.xcconfig
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/xcode/package.xcworkspace/
+
+# IDEs
+.vscode/
+.idea/
+
+# Local tools
+.*/
+!.gitignore
+
+# Logs / temp
+*.log
+*.tmp
+*~
+handoff.md
+docs/
