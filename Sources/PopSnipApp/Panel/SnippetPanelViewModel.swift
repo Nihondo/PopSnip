@@ -25,10 +25,21 @@ enum PanelListItem: Identifiable {
         case .backToParent:
             return "back-to-parent"
         case .tag(let tag, _):
-            return "tag-\(tag.id.uuidString)"
+            return Self.tagItemID(tag.id)
         case .snippet(let match):
-            return "snippet-\(match.snippet.id.uuidString)"
+            return Self.snippetItemID(match.snippet.id)
         }
+    }
+
+    /// トップレベルのセクション描画（`sectionView(for:)`）は `PanelListItem` を経由せず
+    /// `store.library.tags` / `recentSnippets()` を直接 `ForEach` するため、`.id(...)` を
+    /// 個別に付与する際にここと同じ形式の文字列を組み立てられるようにする。
+    static func tagItemID(_ tagID: UUID) -> String {
+        "tag-\(tagID.uuidString)"
+    }
+
+    static func snippetItemID(_ snippetID: UUID) -> String {
+        "snippet-\(snippetID.uuidString)"
     }
 }
 
@@ -268,6 +279,12 @@ final class SnippetPanelViewModel: ObservableObject {
 
     func indexOfTagRow(_ tagID: UUID) -> Int {
         listItems.firstIndex { $0.id == "tag-\(tagID.uuidString)" } ?? 0
+    }
+
+    /// 現在ハイライトされている行の `PanelListItem.id`。カーソルキー操作時に
+    /// `ScrollViewReader` でその行までスクロールするためのターゲットとして使う。
+    var highlightedItemID: String? {
+        listItems.indices.contains(highlightedIndex) ? listItems[highlightedIndex].id : nil
     }
 
     /// `preferences.tagSortOrder` に従ってタグを並び替える。

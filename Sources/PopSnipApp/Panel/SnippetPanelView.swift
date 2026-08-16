@@ -75,17 +75,28 @@ struct SnippetPanelView: View {
     // MARK: - 結果表示
 
     private var resultsList: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 2) {
-                if viewModel.isSearching {
-                    searchResultContent
-                } else {
-                    browsingContent
+        ScrollViewReader { scrollProxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 2) {
+                    if viewModel.isSearching {
+                        searchResultContent
+                    } else {
+                        browsingContent
+                    }
+                }
+                .padding(8)
+            }
+            .frame(maxHeight: 320)
+            // カーソルキーで選択が変わった際、選択行全体が見えるようにスクロールする。
+            .onChange(of: viewModel.highlightedItemID) { _, highlightedItemID in
+                guard let highlightedItemID else {
+                    return
+                }
+                withAnimation(.easeOut(duration: 0.12)) {
+                    scrollProxy.scrollTo(highlightedItemID, anchor: .center)
                 }
             }
-            .padding(8)
         }
-        .frame(maxHeight: 320)
     }
 
     /// 検索ボックスが空のとき: タグ一覧（ドリルダウン）+ 最近使用したスニペット。
@@ -100,6 +111,7 @@ struct SnippetPanelView: View {
         if viewModel.isDrilledDown {
             ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
                 row(for: item, at: index)
+                    .id(item.id)
             }
         } else {
             ForEach(viewModel.preferences.orderedEnabledSections) { section in
@@ -121,6 +133,7 @@ struct SnippetPanelView: View {
                         isSelected: viewModel.indexOfTagRow(tag.id) == viewModel.highlightedIndex
                     )
                     .onTapGesture { viewModel.drillIntoTag(tag.id) }
+                    .id(PanelListItem.tagItemID(tag.id))
                 }
             }
         case .recents:
@@ -129,6 +142,7 @@ struct SnippetPanelView: View {
                 sectionHeader(L10n.string("panel.section.recents"))
                 ForEach(recentSnippets) { snippet in
                     rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
+                        .id(PanelListItem.snippetItemID(snippet.id))
                 }
             }
         case .allSnippets:
@@ -141,6 +155,7 @@ struct SnippetPanelView: View {
     private var searchResultContent: some View {
         ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
             row(for: item, at: index)
+                .id(item.id)
         }
     }
 
