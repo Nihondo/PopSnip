@@ -53,11 +53,12 @@ public struct PanelShortcutConfiguration: Equatable, Sendable {
         return flags
     }
 
-    /// MVP 既定値: ⌥⌘Space。
+    /// 既定値: ⌥⌘P。
+    /// 当初は ⌥⌘Space だったが、Finder の「この Mac を検索」と衝突するため変更した。
     public static let defaultShowPanel = PanelShortcutConfiguration(
-        key: "space",
+        key: "p",
         modifiersRawValue: Int(SwiftUI.EventModifiers([.command, .option]).rawValue),
-        keyCode: kVK_Space
+        keyCode: kVK_ANSI_P
     )
 }
 
