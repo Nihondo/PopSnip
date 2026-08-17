@@ -6,7 +6,33 @@
 
 import SwiftUI
 
+/// `SnippetEditorWindowController` はウインドウを使い回し `rootView` を差し替えるだけなので、
+/// 同一ビュー identity のままだと `.onAppear` が再発火せず、2回目以降のクイック登録で
+/// 選択範囲（`initialBody`）が本文へ反映されない不具合があった。
+/// 呼び出しごとに一意な `sessionID` を発行し `.id(sessionID)` を与えることで、
+/// rootView 差し替えのたびに `SnippetEditorContentView` を新規 identity として扱わせ、
+/// `.onAppear` を確実に再発火させる（timeSlice の ManualCaptureCommentPanel は毎回ビューを
+/// 新規生成することで同じ問題を回避している。ここではウインドウ使い回しの設計を保ったまま
+/// 同等の効果を得る）。
 struct SnippetEditorView: View {
+    let store: SnippetStore
+    let editingSnippetID: UUID?
+    let initialBody: String
+    let onFinish: () -> Void
+    private let sessionID = UUID()
+
+    var body: some View {
+        SnippetEditorContentView(
+            store: store,
+            editingSnippetID: editingSnippetID,
+            initialBody: initialBody,
+            onFinish: onFinish
+        )
+        .id(sessionID)
+    }
+}
+
+private struct SnippetEditorContentView: View {
     @ObservedObject var store: SnippetStore
     /// 編集対象。nil の場合は新規登録。
     let editingSnippetID: UUID?
