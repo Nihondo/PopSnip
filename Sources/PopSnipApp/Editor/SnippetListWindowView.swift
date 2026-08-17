@@ -143,10 +143,10 @@ struct SnippetListWindowView: View {
         .padding(.vertical, 2)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .onTapGesture(count: 2) {
-            editingSnippetID = snippet.id
-            isShowingEditor = true
-        }
+        // ダブルクリックでの編集起動は List(selection:) のネイティブなクリック選択・矢印キー
+        // ナビゲーションと競合し、選択不能/反応遅延の原因になっていた（timeSlice の
+        // CaptureViewerView も同じ理由でリスト行にダブルクリック検出を持たない設計）。
+        // 編集は右クリックのコンテキストメニューで行う。
     }
 
     private var filteredSnippets: [Snippet] {
