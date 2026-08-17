@@ -29,7 +29,7 @@
 	<key>SUFeedURL</key>
 	<string>https://products.desireforwealth.com/appcast/popsnip/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string></string>
+	<string>WMng1Cknwsyv+dBR3czAxuuryePHVLPbqBFVCG1pN/Q=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUScheduledCheckInterval</key>

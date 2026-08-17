@@ -79,7 +79,7 @@ Tag ordering is controlled by `PanelPreferences.tagSortOrder`. The `.recentlyUse
 
 `AppUpdateController` (`Sources/PopSnipApp/Update/AppUpdateController.swift`) wraps `SPUStandardUpdaterController` as a singleton (`.shared`), touched once at `AppSharedState.init()` so scheduled checks run from launch. Update-related keys live in `Sources/Resources/Info.plist` (`SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks`, `SUScheduledCheckInterval`, `SUAutomaticallyUpdate`, `SUAllowsAutomaticUpdates`).
 
-**`SUPublicEDKey` is currently a placeholder empty string.** Until a real EdDSA key pair is generated (`Sparkle/bin/generate_keys` from the resolved Sparkle package) and the public half is filled in, update checks will log `Fatal updater error (1): The EdDSA public key is not valid` — this is expected and non-fatal to the app itself, but real update delivery won't work until the key and the appcast feed at `SUFeedURL` are both live.
+`SUPublicEDKey` holds the real EdDSA public key. The matching **private key lives in the login keychain** (item `Private key for signing Sparkle updates`, created by `Sparkle/bin/generate_keys` from the resolved Sparkle package) and is never committed. Every release archive must be signed with `Sparkle/bin/sign_update <archive>`, and the resulting `sparkle:edSignature` / `length` pasted into the appcast at `SUFeedURL`; an unsigned or mismatched entry is rejected by the updater at download time. If `SUPublicEDKey` is ever blanked out, update checks log `Fatal updater error (1): The EdDSA public key is not valid`.
 
 ## Testing Notes
 
