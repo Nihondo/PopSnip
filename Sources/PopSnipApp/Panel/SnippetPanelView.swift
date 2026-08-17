@@ -42,9 +42,6 @@ struct SnippetPanelView: View {
         .onChange(of: viewModel.queryText) { _, _ in
             viewModel.resetSelectionForContentChange()
         }
-        .onChange(of: viewModel.selectedTagIDs) { _, _ in
-            viewModel.resetSelectionForContentChange()
-        }
     }
 
     // MARK: - 検索ボックス
@@ -154,11 +151,7 @@ struct SnippetPanelView: View {
     private func tagCandidateContent(_ candidates: [PanelTagCandidate]) -> some View {
         switch viewModel.preferences.tagLayoutStyle {
         case .horizontalStrip:
-            TagStripView(
-                candidates: candidates,
-                selectedTagID: viewModel.highlightedTagID,
-                onSelect: viewModel.drillIntoTag
-            )
+            TagStripView(viewModel: viewModel)
             .id(PanelListItem.tagStripItemID)
         case .verticalList:
             ForEach(candidates) { candidate in

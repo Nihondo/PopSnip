@@ -149,27 +149,25 @@ struct TagRowView: View {
 
 /// タグ候補を1行に保ち、選択中のチップへ自動スクロールする。
 struct TagStripView: View {
-    let candidates: [PanelTagCandidate]
-    let selectedTagID: UUID?
-    let onSelect: (UUID) -> Void
+    @ObservedObject var viewModel: SnippetPanelViewModel
 
     var body: some View {
         ScrollViewReader { scrollProxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ForEach(candidates) { candidate in
+                    ForEach(viewModel.visibleTagCandidates) { candidate in
                         TagCandidateChipView(
                             candidate: candidate,
-                            isSelected: selectedTagID == candidate.id
+                            isSelected: viewModel.isTagSelected(candidate.id)
                         )
-                        .onTapGesture { onSelect(candidate.id) }
+                        .onTapGesture { viewModel.drillIntoTag(candidate.id) }
                         .id(candidate.id)
                     }
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 5)
             }
-            .onChange(of: selectedTagID) { _, tagID in
+            .onChange(of: viewModel.highlightedTagID) { _, tagID in
                 guard let tagID else {
                     return
                 }

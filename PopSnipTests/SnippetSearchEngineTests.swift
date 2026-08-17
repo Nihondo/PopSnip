@@ -119,6 +119,27 @@ struct SnippetPanelTagNavigationTests {
         #expect(viewModel.searchMatches.map(\.snippet.id) == [scoped.id])
     }
 
+    @Test("タグ選択後は選択済みタグを除外し、絞り込み結果内のタグだけを残す")
+    func drillDownShowsOnlyUnselectedTagsFromScopedSnippets() {
+        let youtube = SnippetTag(name: "youtube", colorHex: "#7799DD")
+        let prompt = SnippetTag(name: "prompt", colorHex: "#16A34A")
+        let ffmpeg = SnippetTag(name: "ffmpeg", colorHex: "#F59E0B")
+        let suno = SnippetTag(name: "suno", colorHex: "#EF4444")
+        let scoped = Snippet(body: "music", tagIDs: [youtube.id, suno.id])
+        let unrelatedPrompt = Snippet(body: "prompt", tagIDs: [prompt.id])
+        let unrelatedFFmpeg = Snippet(body: "video", tagIDs: [ffmpeg.id])
+        let viewModel = makeViewModel(
+            tags: [youtube, prompt, ffmpeg, suno],
+            snippets: [scoped, unrelatedPrompt, unrelatedFFmpeg]
+        )
+
+        viewModel.drillIntoTag(suno.id)
+
+        #expect(viewModel.visibleTagCandidates.map(\.id) == [youtube.id])
+        #expect(viewModel.visibleTagCandidates.contains { $0.id == suno.id } == false)
+        #expect(viewModel.selection == .backToParent)
+    }
+
     @Test("検索中のタグを確定すると検索語を消して絞り込みに追加する")
     func confirmingSearchTagStartsDrillDown() {
         let youtube = SnippetTag(name: "youtube", colorHex: "#7799DD")
