@@ -67,10 +67,22 @@ struct TagManagerView: View {
             if renamingTagID == tag.id {
                 TextField("", text: $renameText)
                     .textFieldStyle(.roundedBorder)
-                    .frame(width: 140)
+                    .frame(width: 100)
                     .onSubmit { commitRename(tag) }
-                Button(L10n.string("editor.button.save")) { commitRename(tag) }
-                Button(L10n.string("editor.button.cancel")) { renamingTagID = nil }
+                Button {
+                    commitRename(tag)
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+                .buttonStyle(.plain)
+                .help(L10n.string("editor.button.save"))
+                Button {
+                    renamingTagID = nil
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(.plain)
+                .help(L10n.string("editor.button.cancel"))
             } else {
                 TagChipView(tag: tag)
                     .onTapGesture { beginRename(tag) }

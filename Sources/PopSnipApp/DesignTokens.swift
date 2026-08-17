@@ -25,6 +25,9 @@ enum DesignTokens {
         static let panelDefaultHeight: CGFloat = 420
         static let panelMinWidth: CGFloat = 360
         static let panelMinHeight: CGFloat = 220
+        static let listSidebarMinWidth: CGFloat = 260
+        static let listSidebarIdealWidth: CGFloat = 300
+        static let listSidebarMaxWidth: CGFloat = 420
     }
 
     /// パネル・スニペット一覧で使うベースの文字サイズ。

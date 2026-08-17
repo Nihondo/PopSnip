@@ -50,6 +50,7 @@
 "tagManager.deleteConfirm.message" = "\"%@\" will be removed from all snippets.";
 
 /* List window */
+"list.sidebar.toggle" = "Toggle tag sidebar";
 "list.filter.placeholder" = "Filter...";
 "list.row.edit" = "Edit";
 "list.bulkTag.menu" = "Tags";

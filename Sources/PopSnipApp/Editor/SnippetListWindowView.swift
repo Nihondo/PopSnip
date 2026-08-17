@@ -13,20 +13,37 @@ struct SnippetListWindowView: View {
     @State private var isShowingEditor = false
     @State private var isShowingBulkDeleteConfirmation = false
     @State private var isShowingBulkTagPopover = false
+    @State private var sidebarVisibility: NavigationSplitViewVisibility = .all
     @AppStorage(UserDefaultsKeys.panelFontSize) private var fontSize: AppFontSize = .medium
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $sidebarVisibility) {
             ScrollView {
                 TagManagerView(store: store)
                     .padding(DesignTokens.Spacing.medium)
             }
-            .frame(minWidth: 240)
+            .navigationSplitViewColumnWidth(
+                min: DesignTokens.WindowSize.listSidebarMinWidth,
+                ideal: DesignTokens.WindowSize.listSidebarIdealWidth,
+                max: DesignTokens.WindowSize.listSidebarMaxWidth
+            )
         } detail: {
             VStack(spacing: 0) {
                 toolbar
                 Divider()
                 snippetTable
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    withAnimation {
+                        sidebarVisibility = sidebarVisibility == .all ? .detailOnly : .all
+                    }
+                } label: {
+                    Image(systemName: "sidebar.leading")
+                }
+                .help(L10n.string("list.sidebar.toggle"))
             }
         }
         .frame(minWidth: 760, minHeight: 520)

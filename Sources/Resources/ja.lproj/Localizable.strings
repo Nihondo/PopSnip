@@ -50,6 +50,7 @@
 "tagManager.deleteConfirm.message" = "「%@」がすべてのスニペットから削除されます。";
 
 /* 一覧編集 */
+"list.sidebar.toggle" = "タグ一覧の表示切り替え";
 "list.filter.placeholder" = "絞り込み...";
 "list.row.edit" = "編集";
 "list.bulkTag.menu" = "タグ";
