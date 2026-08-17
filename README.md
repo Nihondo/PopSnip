@@ -1,6 +1,6 @@
 # PopSnip
 
-PopSnip is a macOS menu bar app for the text you retype every day — greetings, addresses, code fragments, canned replies.
+PopSnip is a macOS menu bar app for the text you retype every day — prompts, code snippets, canned replies.
 
 Hit a shortcut anywhere, find the snippet, and it lands in the text field you were just typing in.
 
