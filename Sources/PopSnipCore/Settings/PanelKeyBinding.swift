@@ -10,6 +10,10 @@ import Foundation
 public enum PanelKeyEvent: Equatable, Sendable {
     case arrowUp
     case arrowDown
+    case arrowLeft
+    case arrowRight
+    case tabForward
+    case tabBackward
     case confirm
     case cancel
     /// 1〜9 の数字キー（⌘1〜⌘9 の直接選択用）。
@@ -20,6 +24,8 @@ public enum PanelKeyEvent: Equatable, Sendable {
 public enum PanelKeyAction: Equatable, Sendable {
     case moveSelectionUp
     case moveSelectionDown
+    case moveTagSelectionPrevious
+    case moveTagSelectionNext
     case confirmSelection
     case cancel
     /// 0-based のインデックスを直接選択する。
@@ -37,6 +43,10 @@ public enum PanelKeyBinding {
             return .moveSelectionUp
         case .arrowDown:
             return .moveSelectionDown
+        case .arrowLeft, .tabBackward:
+            return .moveTagSelectionPrevious
+        case .arrowRight, .tabForward:
+            return .moveTagSelectionNext
         case .confirm:
             return .confirmSelection
         case .cancel:

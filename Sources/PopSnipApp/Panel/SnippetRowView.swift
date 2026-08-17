@@ -147,6 +147,68 @@ struct TagRowView: View {
     }
 }
 
+/// タグ候補を1行に保ち、選択中のチップへ自動スクロールする。
+struct TagStripView: View {
+    let candidates: [PanelTagCandidate]
+    let selectedTagID: UUID?
+    let onSelect: (UUID) -> Void
+
+    var body: some View {
+        ScrollViewReader { scrollProxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(candidates) { candidate in
+                        TagCandidateChipView(
+                            candidate: candidate,
+                            isSelected: selectedTagID == candidate.id
+                        )
+                        .onTapGesture { onSelect(candidate.id) }
+                        .id(candidate.id)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+            }
+            .onChange(of: selectedTagID) { _, tagID in
+                guard let tagID else {
+                    return
+                }
+                withAnimation(.easeOut(duration: 0.12)) {
+                    scrollProxy.scrollTo(tagID, anchor: .center)
+                }
+            }
+        }
+        .contentShape(Rectangle())
+    }
+}
+
+/// 1行タグストリップ内の「タグ名 + 件数」チップ。
+private struct TagCandidateChipView: View {
+    let candidate: PanelTagCandidate
+    let isSelected: Bool
+
+    @Environment(\.appFontSize) private var appFontSize
+
+    var body: some View {
+        HStack(spacing: 5) {
+            TagChipView(tag: candidate.tag)
+            Text("\(candidate.snippetCount)")
+                .font(appFontSize.font(DesignTokens.Typography.rowBody))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(3)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isSelected ? Color.accentColor.opacity(0.32) : Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(isSelected ? Color.accentColor.opacity(0.8) : Color.clear, lineWidth: 1.2)
+        )
+        .contentShape(Rectangle())
+    }
+}
+
 /// タグドリルダウン中の「< タグ1 タグ2 ...」行（パンくず）。クリックだけでなく
 /// カーソルキーでも選択できる（一覧の先頭項目として扱われる）。選択すると1段階だけ戻る。
 /// パンくずの各タグチップは非クリック（表示のみ）で、行全体のクリック / Enter が

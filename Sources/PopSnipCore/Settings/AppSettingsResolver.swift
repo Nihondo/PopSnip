@@ -41,6 +41,12 @@ public enum AppSettingsResolver {
             preferences.tagSortOrder = tagSortOrder
         }
         if
+            let tagLayoutStyleRawValue = userDefaults.string(forKey: UserDefaultsKeys.panelTagLayoutStyle),
+            let tagLayoutStyle = TagLayoutStyle(rawValue: tagLayoutStyleRawValue)
+        {
+            preferences.tagLayoutStyle = tagLayoutStyle
+        }
+        if
             let positionRawValue = userDefaults.string(forKey: UserDefaultsKeys.panelPresentationPosition),
             let position = PanelPosition(rawValue: positionRawValue)
         {
@@ -99,6 +105,7 @@ public enum AppSettingsResolver {
         userDefaults.set(preferences.searchResultLimit, forKey: UserDefaultsKeys.panelSearchResultLimit)
         userDefaults.set(preferences.searchSortOrder.rawValue, forKey: UserDefaultsKeys.panelSearchSortOrder)
         userDefaults.set(preferences.tagSortOrder.rawValue, forKey: UserDefaultsKeys.panelTagSortOrder)
+        userDefaults.set(preferences.tagLayoutStyle.rawValue, forKey: UserDefaultsKeys.panelTagLayoutStyle)
         userDefaults.set(preferences.presentationPosition.rawValue, forKey: UserDefaultsKeys.panelPresentationPosition)
         userDefaults.set(preferences.insertionStrategy.rawValue, forKey: UserDefaultsKeys.insertionStrategy)
         userDefaults.set(preferences.enterKeyBehavior.rawValue, forKey: UserDefaultsKeys.panelEnterKeyBehavior)

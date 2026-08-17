@@ -52,6 +52,14 @@ struct PanelLayoutSettingsView: View {
                 }
                 .onChange(of: preferences.tagSortOrder) { savePreferences() }
 
+                Picker(L10n.string("settings.panel.tagLayoutStyle"), selection: $preferences.tagLayoutStyle) {
+                    Text(L10n.string("settings.panel.tagLayoutStyle.horizontalStrip"))
+                        .tag(TagLayoutStyle.horizontalStrip)
+                    Text(L10n.string("settings.panel.tagLayoutStyle.verticalList"))
+                        .tag(TagLayoutStyle.verticalList)
+                }
+                .onChange(of: preferences.tagLayoutStyle) { savePreferences() }
+
                 Picker(L10n.string("settings.panel.presentationPosition"), selection: $preferences.presentationPosition) {
                     Text(L10n.string("settings.panel.presentationPosition.mouse")).tag(PanelPosition.mouseLocation)
                     Text(L10n.string("settings.panel.presentationPosition.center")).tag(PanelPosition.screenCenter)

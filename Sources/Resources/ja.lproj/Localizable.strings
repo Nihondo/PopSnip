@@ -93,6 +93,9 @@
 "settings.panel.tagSortOrder" = "タグの並び順";
 "settings.panel.tagSortOrder.registrationOrder" = "登録順";
 "settings.panel.tagSortOrder.snippetCountDescending" = "一致件数の多い順";
+"settings.panel.tagLayoutStyle" = "タグの表示形式";
+"settings.panel.tagLayoutStyle.horizontalStrip" = "1行（横スクロール）";
+"settings.panel.tagLayoutStyle.verticalList" = "1タグ1行";
 "settings.panel.presentationPosition" = "パネルの表示位置";
 "settings.panel.presentationPosition.mouse" = "マウス位置";
 "settings.panel.presentationPosition.center" = "画面中央";

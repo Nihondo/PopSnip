@@ -5,10 +5,10 @@ PopSnip is a lightweight macOS menu bar app for storing text snippets and insert
 ## Features
 
 - **Global shortcut search panel** — press a shortcut (default `⌥⌘Space`) anywhere to open a search box near your cursor
-- **Fast search** — matches in the title and body are highlighted as you type; results can be ranked by relevance, usage count, or last updated
-- **Tag browsing** — when the search box is empty, snippets are organized by colored tag chips you can drill into
+- **Fast search** — searches titles, bodies, and tag names as you type; matching tags remain available as filter suggestions
+- **Compact tag browsing** — colored tag chips stay in a single horizontally scrollable row by default, with an optional one-tag-per-row layout
 - **One-key insertion** — the focused snippet is inserted directly into whatever text field you were using, via the Accessibility API with an automatic clipboard fallback
-- **Keyboard-first** — arrow keys to move, Enter to insert, `⌘1`–`⌘9` to pick a result directly, Backspace to back out of a tag, Esc to dismiss
+- **Keyboard-first** — arrow keys to move, Tab / Shift+Tab to cycle tags, Enter to select, `⌘1`–`⌘9` to pick a snippet directly, Backspace to back out of a tag, Esc to dismiss
 - **Right-click to edit or delete** any snippet straight from the search panel
 - **Resizable panel** that remembers the size you last left it at
 - **Snippet list window** for browsing everything at once, bulk tag editing, and tag management (rename, recolor, delete)
@@ -48,9 +48,10 @@ Build and run the `PopSnip` scheme in Xcode (`⌘R`).
 ### Search Panel
 
 - Open/close with your configured shortcut (default `⌥⌘Space`). The panel appears near your mouse cursor by default (configurable to screen center).
-- Type to search across snippet titles, bodies, and tag names — matches are highlighted.
+- Type to search across snippet titles, bodies, and tag names. Matching tag suggestions remain above the snippet results; selecting one clears the query and starts a tag drill-down.
 - `↑` / `↓` to move the selection, `Enter` to insert, `Esc` to dismiss.
-- `⌘1`–`⌘9` inserts a result directly by its position in the list (toggle in **Settings → Panel**).
+- When a tag is selected, use `Tab` / `Shift+Tab` or `←` / `→` to cycle through the visible tags. The selection wraps at either end.
+- `⌘1`–`⌘9` inserts a snippet directly by its position in the snippet results; tag suggestions are not counted (toggle in **Settings → Panel**).
 - With the search box empty, `Backspace` steps back one level out of a tag drill-down.
 - Right-click a snippet for **Edit** / **Delete**.
 - Drag any edge of the panel to resize it — PopSnip remembers your preferred size.
@@ -60,7 +61,8 @@ Build and run the `PopSnip` scheme in Xcode (`⌘R`).
 
 - A snippet can have multiple tags, shown as colored rounded chips.
 - New tags get an automatically assigned color; click the color circle in the tag manager to pick a different one from the palette.
-- With the search box empty, tags are listed at the top of the panel — click one to drill into snippets that have it.
+- Tags appear in a single horizontally scrollable row by default. The selected tag scrolls into view automatically; choose the one-tag-per-row layout in **Settings → Panel** if preferred.
+- Click or press Enter on a tag to drill into snippets that have it. Search within a drill-down is limited to the currently selected tag scope, and additional matching tags can be selected to narrow it further.
 - Add or create tags while editing a snippet, or manage all tags — rename, recolor, delete, or add new ones — from the sidebar of the snippet list window.
 
 ### Snippet List Window
@@ -77,7 +79,7 @@ Open it from the panel's **List** button or the menu bar.
 Open from the panel's **Settings** button or **PopSnip Settings...** in the menu bar. A sidebar switches between:
 
 - **General** — launch at login, insertion method (Automatic / Accessibility only / Clipboard only), clipboard restore delay, font size, and the snippet storage location.
-- **Panel** — which sections appear and in what order, item counts, sort order, panel position, Enter key behavior, number-key selection, and tag color display.
+- **Panel** — which sections appear and in what order, item counts, sort order, tag layout, panel position, Enter key behavior, number-key selection, and tag color display.
 - **Shortcut** — customize the global shortcut for each action.
 - **Permission** — check and grant Accessibility access.
 - **Update** — check for updates now, toggle automatic checks, and see the current version.

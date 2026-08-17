@@ -34,6 +34,7 @@ public enum UserDefaultsKeys {
     public static let panelSearchResultLimit = "panel.searchResultLimit"
     public static let panelSearchSortOrder = "panel.searchSortOrder"
     public static let panelTagSortOrder = "panel.tagSortOrder"
+    public static let panelTagLayoutStyle = "panel.tagLayoutStyle"
     public static let panelPresentationPosition = "panel.presentationPosition"
     public static let panelEnterKeyBehavior = "panel.enterKeyBehavior"
     public static let panelIsNumberKeySelectionEnabled = "panel.isNumberKeySelectionEnabled"

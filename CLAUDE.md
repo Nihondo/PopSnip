@@ -63,7 +63,11 @@ All user-facing strings go through `L10n.string(_:)` / `L10n.format(_:_:)`, back
 
 ### Panel key handling
 
-Arrow keys, Enter, Backspace, Esc, and `⌘1`–`⌘9` inside the search panel are handled by a single `NSEvent` local monitor in `SnippetPanelPresenter`, not by SwiftUI `onKeyPress` or `NSTextFieldDelegate.doCommandBy`. This is deliberate: SwiftUI's `TextField` + `onKeyPress` and the field editor's `doCommandBy` both have known issues intercepting keys during Japanese (IME) text composition. The monitor checks `hasMarkedText()` on the field editor and passes the event through untouched while IME composition is active. Don't move this logic back into SwiftUI without re-testing IME behavior end to end.
+Arrow keys, Tab/Shift+Tab, Enter, Backspace, Esc, and `⌘1`–`⌘9` inside the search panel are handled by a single `NSEvent` local monitor in `SnippetPanelPresenter`, not by SwiftUI `onKeyPress` or `NSTextFieldDelegate.doCommandBy`. This is deliberate: SwiftUI's `TextField` + `onKeyPress` and the field editor's `doCommandBy` both have known issues intercepting keys during Japanese (IME) text composition. The monitor checks `hasMarkedText()` on the field editor and passes the event through untouched while IME composition is active. Don't move this logic back into SwiftUI without re-testing IME behavior end to end.
+
+### Panel tag navigation
+
+`SnippetPanelViewModel` stores panel focus as a stable `PanelSelection` (back row, tag ID, or snippet ID plus section context), rather than a raw row index. `listItems` is the shared logical ordering for rendering and keyboard actions. In the default `.horizontalStrip` layout, all visible tags occupy one vertical navigation row while Tab/Shift+Tab and left/right cycle individual tags; `.verticalList` keeps one tag per vertical row. Search filters tag suggestions and snippets within the current selected-tag scope, but `⌘1`–`⌘9` always counts snippet results only.
 
 ### Sibling project: timeSlice
 
@@ -77,5 +81,5 @@ Arrow keys, Enter, Backspace, Esc, and `⌘1`–`⌘9` inside the search panel a
 
 ## Testing Notes
 
-- `PopSnipTests` only covers `PopSnipCore`. When adding logic to `SnippetStore`, `SnippetSearchEngine`, `TagColorAssigner`, or Codable models, add a corresponding Swift Testing case.
-- There is no automated UI test target. For SwiftUI/AppKit changes (panel layout, settings screens, menu bar), build and run the app manually and exercise the golden path plus edge cases (IME composition, empty states, resize) before calling a change done.
+- `PopSnipTests` covers core logic and testable panel view-model behavior. Add Swift Testing coverage for `SnippetStore`, `SnippetSearchEngine`, `TagColorAssigner`, Codable models, settings resolution, and panel selection/search logic as applicable.
+- There is no automated UI rendering target. For SwiftUI/AppKit changes (panel layout, settings screens, menu bar), build and run the app manually and exercise the golden path plus edge cases (IME composition, empty states, resize) before calling a change done.

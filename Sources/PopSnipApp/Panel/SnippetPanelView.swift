@@ -1,16 +1,7 @@
 // MARK: - SnippetPanelView.swift
-// 検索パネルのメインコンテンツ。PopSnip_UI_plan.md のレイアウトに従う:
-// 検索ボックス → (空欄時: タグ一覧 + 最近使用 / 入力時: 検索結果) → フッター。
-//
-// キー操作・選択状態は SnippetPanelViewModel に集約し、検索ボックスは IMESafeSearchField
-// （プレーンな NSTextField ラッパー）を使う。SwiftUI の TextField + onKeyPress は
-// 日本語入力の変換中に Enter / 矢印キーを誤って奪ってしまう既知の問題があるため採用していない。
-// 実際のキー操作判定（矢印・Enter・Backspace・Esc・⌘1〜⌘9）は
-// SnippetPanelPresenter 側の NSEvent ローカルモニタで一元的に行う
-// （IME 変換中かどうかを hasMarkedText で判定できるのがそちら側のため）。
-//
-// セクションの描画は PanelPreferences.sectionOrder / enabledSections を ForEach で回す
-// （[[docs-macos-snippet-menu-app-plan]] の設定駆動方針）。
+// 検索ボックス → タグ候補 / スニペット結果 → フッターで構成する。
+// キー入力は SnippetPanelPresenter の NSEvent モニタで一元化し、
+// IME 変換中はパネル側のナビゲーションより入力システムを優先する。
 
 import AppKit
 import SwiftUI
@@ -24,7 +15,6 @@ struct SnippetPanelView: View {
     let onOpenList: () -> Void
     let onOpenSettings: () -> Void
     let onDeleteSnippet: (Snippet) -> Void
-    /// 生成された検索フィールドを Presenter へ引き渡す（キー操作は Presenter のキーモニタが担当する）。
     let onSearchFieldCreated: (NSTextField) -> Void
 
     @Environment(\.appFontSize) private var appFontSize
@@ -37,8 +27,6 @@ struct SnippetPanelView: View {
             Divider().opacity(0.5)
             footer
         }
-        // パネルはリサイズ可能なので、内容側で固定幅は指定しない（Presenter 側で
-        // ウインドウサイズを管理し、記憶したサイズをそのまま反映させる）。
         .frame(minWidth: DesignTokens.WindowSize.panelMinWidth, minHeight: DesignTokens.WindowSize.panelMinHeight)
         .background(panelBackground)
         .clipShape(RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous))
@@ -49,12 +37,13 @@ struct SnippetPanelView: View {
         .shadow(color: .black.opacity(0.24), radius: 20, x: 0, y: 10)
         .onAppear {
             store.reloadIfNeeded()
+            viewModel.resetSelectionForContentChange()
         }
         .onChange(of: viewModel.queryText) { _, _ in
-            viewModel.resetHighlightForQueryChange()
+            viewModel.resetSelectionForContentChange()
         }
         .onChange(of: viewModel.selectedTagIDs) { _, _ in
-            viewModel.resetHighlightForQueryChange()
+            viewModel.resetSelectionForContentChange()
         }
     }
 
@@ -82,8 +71,8 @@ struct SnippetPanelView: View {
         ScrollViewReader { scrollProxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 2) {
-                    if viewModel.isSearching {
-                        searchResultContent
+                    if viewModel.isSearching || viewModel.isDrilledDown {
+                        scopedContent
                     } else {
                         browsingContent
                     }
@@ -92,7 +81,6 @@ struct SnippetPanelView: View {
                 .padding(.vertical, 8)
             }
             .frame(maxHeight: .infinity)
-            // カーソルキーで選択が変わった際、選択行全体が見えるようにスクロールする。
             .onChange(of: viewModel.highlightedItemID) { _, highlightedItemID in
                 guard let highlightedItemID else {
                     return
@@ -104,24 +92,32 @@ struct SnippetPanelView: View {
         }
     }
 
-    /// 検索ボックスが空のとき: タグ一覧（ドリルダウン）+ 最近使用したスニペット。
-    ///
-    /// ドリルダウン中は listItems をそのまま enumerated() して描画する。
-    /// 以前は「< タグ名」行と各スニペット行で別々にインデックスを計算していたため
-    /// （viewModel.globalIndex(ofSnippetID:) と snippetsForSelectedTag(_:) を別々に呼ぶ構成）、
-    /// 実際に選択されている項目と表示上のハイライト対象がズレる不具合があった。
-    /// listItems の enumerated() を唯一の情報源にすることで、内容とインデックスが常に一致する。
+    /// 検索中またはタグドリルダウン中の共通表示。
     @ViewBuilder
-    private var browsingContent: some View {
+    private var scopedContent: some View {
         if viewModel.isDrilledDown {
-            ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
-                row(for: item, at: index)
-                    .id(item.id)
+            BackRowView(tags: viewModel.selectedTags, isSelected: viewModel.isBackSelected())
+                .onTapGesture { viewModel.goBackOneLevel() }
+                .id(PanelListItem.backItemID)
+        }
+
+        if viewModel.visibleTagCandidates.isEmpty == false {
+            if viewModel.isSearching {
+                sectionHeader(L10n.string("panel.section.tags"))
             }
-        } else {
-            ForEach(viewModel.preferences.orderedEnabledSections) { section in
-                sectionView(for: section)
-            }
+            tagCandidateContent(viewModel.visibleTagCandidates)
+        }
+
+        ForEach(Array(viewModel.scopedSnippetItems.enumerated()), id: \.element.id) { ordinal, item in
+            snippetRow(for: item, searchOrdinal: viewModel.isSearching ? ordinal + 1 : nil)
+                .id(item.id)
+        }
+    }
+
+    /// 検索語もタグ絞り込みもない場合は、設定されたセクション順を保つ。
+    private var browsingContent: some View {
+        ForEach(viewModel.preferences.orderedEnabledSections) { section in
+            sectionView(for: section)
         }
     }
 
@@ -129,83 +125,96 @@ struct SnippetPanelView: View {
     private func sectionView(for section: PanelSection) -> some View {
         switch section {
         case .tags:
-            if store.library.tags.isEmpty == false {
+            if viewModel.visibleTagCandidates.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.tags"))
-                ForEach(store.library.tags) { tag in
-                    TagRowView(
-                        tag: tag,
-                        snippetCount: viewModel.snippetCount(for: tag.id),
-                        isSelected: viewModel.indexOfTagRow(tag.id) == viewModel.highlightedIndex
-                    )
-                    .onTapGesture { viewModel.drillIntoTag(tag.id) }
-                    .id(PanelListItem.tagItemID(tag.id))
-                }
+                tagCandidateContent(viewModel.visibleTagCandidates)
             }
         case .recents:
-            let recentSnippets = viewModel.recentSnippets()
-            if recentSnippets.isEmpty == false {
-                sectionHeader(L10n.string("panel.section.recents"))
-                ForEach(recentSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
-                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
-                }
-            }
-        case .allSnippets:
-            let allSnippets = viewModel.allSnippets()
-            if allSnippets.isEmpty == false {
-                sectionHeader(L10n.string("panel.section.allSnippets"))
-                ForEach(allSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
-                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
-                }
-            }
-        case .favorites:
-            let favoriteSnippets = viewModel.favoriteSnippets()
-            if favoriteSnippets.isEmpty == false {
-                sectionHeader(L10n.string("panel.section.favorites"))
-                ForEach(favoriteSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
-                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
-                }
-            }
-        }
-    }
-
-    private var searchResultContent: some View {
-        ForEach(Array(viewModel.listItems.enumerated()), id: \.element.id) { index, item in
-            row(for: item, at: index)
-                .id(item.id)
-        }
-    }
-
-    /// `listItems` の1項目を、その場でのインデックス（キー操作の解決に使うのと同一の値）で描画する。
-    @ViewBuilder
-    private func row(for item: PanelListItem, at index: Int) -> some View {
-        switch item {
-        case .backToParent:
-            BackRowView(tags: viewModel.selectedTags, isSelected: index == viewModel.highlightedIndex)
-                .onTapGesture { viewModel.goBackOneLevel() }
-        case .tag(let tag, let count):
-            TagRowView(
-                tag: tag,
-                snippetCount: count,
-                isSelected: index == viewModel.highlightedIndex
+            snippetSection(
+                titleKey: "panel.section.recents",
+                snippets: viewModel.recentSnippets(),
+                context: section.rawValue
             )
-            .onTapGesture { viewModel.drillIntoTag(tag.id) }
-        case .snippet(let match, _):
+        case .allSnippets:
+            snippetSection(
+                titleKey: "panel.section.allSnippets",
+                snippets: viewModel.allSnippets(),
+                context: section.rawValue
+            )
+        case .favorites:
+            snippetSection(
+                titleKey: "panel.section.favorites",
+                snippets: viewModel.favoriteSnippets(),
+                context: section.rawValue
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func tagCandidateContent(_ candidates: [PanelTagCandidate]) -> some View {
+        switch viewModel.preferences.tagLayoutStyle {
+        case .horizontalStrip:
+            TagStripView(
+                candidates: candidates,
+                selectedTagID: viewModel.highlightedTagID,
+                onSelect: viewModel.drillIntoTag
+            )
+            .id(PanelListItem.tagStripItemID)
+        case .verticalList:
+            ForEach(candidates) { candidate in
+                TagRowView(
+                    tag: candidate.tag,
+                    snippetCount: candidate.snippetCount,
+                    isSelected: viewModel.isTagSelected(candidate.id)
+                )
+                .onTapGesture { viewModel.drillIntoTag(candidate.id) }
+                .id(PanelListItem.tagItemID(candidate.id))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func snippetSection(titleKey: String, snippets: [Snippet], context: String) -> some View {
+        if snippets.isEmpty == false {
+            sectionHeader(L10n.string(titleKey))
+            ForEach(snippets) { snippet in
+                snippetRow(for: snippet, context: context)
+                    .id(PanelListItem.snippetItemID(snippet.id, context: context))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func snippetRow(for item: PanelListItem, searchOrdinal: Int?) -> some View {
+        if case .snippet(let match, let context) = item {
             SnippetRowView(
                 snippet: match.snippet,
                 tags: viewModel.tags(for: match.snippet),
                 titleHighlights: match.titleHighlights,
                 bodyHighlights: match.bodyHighlights,
                 isTagColorShown: viewModel.preferences.isTagColorShown,
-                isSelected: index == viewModel.highlightedIndex,
-                indexHint: viewModel.isSearching && viewModel.preferences.isNumberKeySelectionEnabled ? index + 1 : nil,
+                isSelected: viewModel.isSnippetSelected(match.snippet.id, context: context),
+                indexHint: viewModel.preferences.isNumberKeySelectionEnabled ? searchOrdinal : nil,
                 onToggleFavorite: { viewModel.toggleFavorite(match.snippet.id) }
             )
-            .onTapGesture { viewModel.selectByIndex(index) }
+            .onTapGesture { viewModel.selectSnippet(match.snippet) }
             .snippetContextMenu(match.snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
         }
+    }
+
+    private func snippetRow(for snippet: Snippet, context: String) -> some View {
+        SnippetRowView(
+            snippet: snippet,
+            tags: viewModel.tags(for: snippet),
+            titleHighlights: [],
+            bodyHighlights: [],
+            isTagColorShown: viewModel.preferences.isTagColorShown,
+            isSelected: viewModel.isSnippetSelected(snippet.id, context: context),
+            indexHint: nil,
+            onToggleFavorite: { viewModel.toggleFavorite(snippet.id) }
+        )
+        .onTapGesture { viewModel.selectSnippet(snippet) }
+        .snippetContextMenu(snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
     }
 
     private func sectionHeader(_ title: String) -> some View {
@@ -252,26 +261,9 @@ struct SnippetPanelView: View {
                 )
         }
     }
-
-    private func rowView(for snippet: Snippet, at index: Int) -> some View {
-        SnippetRowView(
-            snippet: snippet,
-            tags: viewModel.tags(for: snippet),
-            titleHighlights: [],
-            bodyHighlights: [],
-            isTagColorShown: viewModel.preferences.isTagColorShown,
-            isSelected: index == viewModel.highlightedIndex,
-            indexHint: nil,
-            onToggleFavorite: { viewModel.toggleFavorite(snippet.id) }
-        )
-        .onTapGesture { viewModel.selectByIndex(index) }
-        .snippetContextMenu(snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
-    }
 }
 
 private extension View {
-    /// スニペット行の右クリックメニュー（編集・削除）。
-    /// UI_fix.md「メインUI上のスニペットリストで、右クリックしたときに、スニペットの編集・削除ができるようにする」。
     func snippetContextMenu(
         _ snippet: Snippet,
         onEdit: @escaping (_ editingSnippetID: UUID?) -> Void,

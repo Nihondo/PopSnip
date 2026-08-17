@@ -294,7 +294,7 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
 
     // MARK: - キーモニタ
     //
-    // Esc・上下矢印・Enter・Backspace・⌘1〜⌘9 をここで一元的に処理する。
+    // Esc・矢印・Tab・Enter・Backspace・⌘1〜⌘9 をここで一元的に処理する。
     // 当初は上下矢印/Enter/Backspace を IMESafeSearchField 側の NSTextFieldDelegate の
     // doCommandBy 経由で判定していたが、単一行の NSTextField では field editor が
     // 上下矢印キーに対して doCommandBy を確実に発火させないケースがあり、検索結果の絞り込み中や
@@ -320,8 +320,7 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
                 let digit = character.wholeNumberValue,
                 (1...9).contains(digit)
             {
-                self.activeViewModel?.handleKeyEvent(.digit(digit))
-                return nil
+                return self.activeViewModel?.handleKeyEvent(.digit(digit)) == true ? nil : keyEvent
             }
 
             // IME 変換中（変換候補の選択中など）は、矢印・Enter・Backspace を
@@ -335,14 +334,18 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
                 self.closePanelIfNeeded(animated: true)
                 return nil
             case 126: // 上矢印
-                self.activeViewModel?.handleKeyEvent(.arrowUp)
-                return nil
+                return self.activeViewModel?.handleKeyEvent(.arrowUp) == true ? nil : keyEvent
             case 125: // 下矢印
-                self.activeViewModel?.handleKeyEvent(.arrowDown)
-                return nil
+                return self.activeViewModel?.handleKeyEvent(.arrowDown) == true ? nil : keyEvent
+            case 123: // 左矢印（タグ選択中のみ消費）
+                return self.activeViewModel?.handleKeyEvent(.arrowLeft) == true ? nil : keyEvent
+            case 124: // 右矢印（タグ選択中のみ消費）
+                return self.activeViewModel?.handleKeyEvent(.arrowRight) == true ? nil : keyEvent
+            case 48: // Tab / Shift+Tab（タグ選択中のみ消費）
+                let event: PanelKeyEvent = keyEvent.modifierFlags.contains(.shift) ? .tabBackward : .tabForward
+                return self.activeViewModel?.handleKeyEvent(event) == true ? nil : keyEvent
             case 36: // Enter / Return
-                self.activeViewModel?.handleKeyEvent(.confirm)
-                return nil
+                return self.activeViewModel?.handleKeyEvent(.confirm) == true ? nil : keyEvent
             case 51: // Backspace（Delete）
                 if self.activeViewModel?.handleBackspaceForDrillDownIfNeeded() == true {
                     return nil

@@ -34,6 +34,14 @@ public enum TagSortOrder: String, Codable, CaseIterable, Sendable {
     case snippetCountDescending
 }
 
+/// 検索パネル内のタグ候補の表示形式。
+public enum TagLayoutStyle: String, Codable, CaseIterable, Sendable {
+    /// タグを1行に並べ、横スクロールで全件を表示する。
+    case horizontalStrip
+    /// タグを1件1行で縦に表示する。
+    case verticalList
+}
+
 /// パネルの表示・操作に関する設定。
 public struct PanelPreferences: Equatable, Sendable {
     public var sectionOrder: [PanelSection]
@@ -42,6 +50,7 @@ public struct PanelPreferences: Equatable, Sendable {
     public var searchResultLimit: Int
     public var searchSortOrder: SearchSortOrder
     public var tagSortOrder: TagSortOrder
+    public var tagLayoutStyle: TagLayoutStyle
     public var presentationPosition: PanelPosition
     public var insertionStrategy: InsertionStrategy
     public var enterKeyBehavior: EnterKeyBehavior
@@ -57,6 +66,7 @@ public struct PanelPreferences: Equatable, Sendable {
         searchResultLimit: Int = 20,
         searchSortOrder: SearchSortOrder = .relevance,
         tagSortOrder: TagSortOrder = .registrationOrder,
+        tagLayoutStyle: TagLayoutStyle = .horizontalStrip,
         presentationPosition: PanelPosition = .mouseLocation,
         insertionStrategy: InsertionStrategy = .automatic,
         enterKeyBehavior: EnterKeyBehavior = .insert,
@@ -71,6 +81,7 @@ public struct PanelPreferences: Equatable, Sendable {
         self.searchResultLimit = searchResultLimit
         self.searchSortOrder = searchSortOrder
         self.tagSortOrder = tagSortOrder
+        self.tagLayoutStyle = tagLayoutStyle
         self.presentationPosition = presentationPosition
         self.insertionStrategy = insertionStrategy
         self.enterKeyBehavior = enterKeyBehavior
