@@ -194,11 +194,17 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
                 return
             }
             self.isHandlingPanelAction = false
+            // クリップボードを書き換える ClipboardInserter が走る前に {{clipboard}} の値を
+            // 確定させる必要があるため、展開はここ（挿入直前）で行う。
+            let context = PlaceholderContext.capture(from: target)
+            let expanded = PlaceholderExpander.expand(snippet.body, context: context)
             let result = SnippetInsertionService.insert(
-                snippet.body,
+                expanded.text,
                 into: target,
                 strategy: preferences.insertionStrategy,
-                clipboardRestoreDelayMs: preferences.clipboardRestoreDelayMs
+                clipboardRestoreDelayMs: preferences.clipboardRestoreDelayMs,
+                caretUTF16Offset: expanded.caretUTF16Offset,
+                caretCharacterOffsetFromEnd: expanded.caretCharacterOffsetFromEnd
             )
             switch result {
             case .insertedViaAccessibility, .insertedViaClipboard:

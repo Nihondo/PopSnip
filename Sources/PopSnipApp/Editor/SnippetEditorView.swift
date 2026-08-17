@@ -4,6 +4,7 @@
 // （PopSnip_UI_plan.md「テキスト選択範囲がある状態で、スニペット登録を行うと、
 // 選択範囲のテキストが本文に自動で入力される」）。
 
+import AppKit
 import SwiftUI
 
 /// `SnippetEditorWindowController` はウインドウを使い回し `rootView` を差し替えるだけなので、
@@ -46,6 +47,8 @@ private struct SnippetEditorContentView: View {
     @State private var newTagName = ""
     @State private var isFavorite = false
     @State private var isShowingDeleteConfirmation = false
+    /// パレットからのクリック挿入でカーソル位置へ差し込むために保持する。
+    @State private var bodyTextView: NSTextView?
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
@@ -73,13 +76,13 @@ private struct SnippetEditorContentView: View {
                 Text(L10n.string("editor.field.body"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                TextEditor(text: $bodyDraft)
-                    .font(.system(.body, design: .monospaced))
+                SnippetBodyTextView(text: $bodyDraft, onTextViewCreated: { bodyTextView = $0 })
                     .frame(minHeight: 160)
                     .overlay(
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
                             .stroke(Color.secondary.opacity(0.3))
                     )
+                PlaceholderPaletteView(onInsert: insertPlaceholder)
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -120,7 +123,7 @@ private struct SnippetEditorContentView: View {
             }
         }
         .padding(DesignTokens.Spacing.large)
-        .frame(minWidth: 480, minHeight: 420)
+        .frame(minWidth: 480, minHeight: 500)
         .onAppear(perform: loadInitialState)
         .alert(
             L10n.string("editor.deleteConfirm.title"),
@@ -147,6 +150,22 @@ private struct SnippetEditorContentView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    /// パレットのチップがクリックされたときに、本文のカーソル位置へトークンを挿入する。
+    /// `bodyTextView` 未生成（描画前）の場合は本文末尾への追記でフォールバックする。
+    private func insertPlaceholder(_ token: String) {
+        guard let bodyTextView else {
+            bodyDraft += token
+            return
+        }
+        let selectedRange = bodyTextView.selectedRange()
+        guard bodyTextView.shouldChangeText(in: selectedRange, replacementString: token) else {
+            return
+        }
+        bodyTextView.insertText(token, replacementRange: selectedRange)
+        bodyTextView.didChangeText()
+        bodyTextView.window?.makeFirstResponder(bodyTextView)
     }
 
     private func toggleTag(_ tagID: UUID) {

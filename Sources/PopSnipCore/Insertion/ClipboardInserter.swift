@@ -22,11 +22,19 @@ public enum ClipboardInserter {
     /// 待機時間の上限（ミリ秒）。
     public static let maxRestoreDelayMs = 300
 
+    /// キャレット移動（左矢印キー送出）の暴走防止用上限。
+    private static let maxCaretMoveCount = 500
+
     /// `text` をクリップボード経由で貼り付ける。
     /// 貼り付けの成否によらず、必ず元のクリップボード内容を復元する（`defer` で保証）。
+    /// - Parameter caretCharacterOffsetFromEnd: `{{cursor}}` プレースホルダが指定していた
+    ///   キャレット位置（貼り付けたテキストの末尾から何文字戻るか）。貼り付け完了を待った後、
+    ///   左矢印キーをその回数だけ送出する。この経路はアプリ側のカーソル移動 API を持たないため
+    ///   キー送出でしか実現できず、貼り付け先アプリの反映タイミング次第では確実性が下がる。
     public static func insert(
         _ text: String,
-        restoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs
+        restoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs,
+        caretCharacterOffsetFromEnd: Int? = nil
     ) {
         let pasteboard = NSPasteboard.general
         let snapshot = captureSnapshot(from: pasteboard)
@@ -49,6 +57,8 @@ public enum ClipboardInserter {
             expectedChangeCount: ownChangeCountAfterWrite,
             delayMs: min(restoreDelayMs, ClipboardInserter.maxRestoreDelayMs)
         )
+
+        moveCaretLeftIfNeeded(by: caretCharacterOffsetFromEnd)
     }
 
     // MARK: - 退避
@@ -85,6 +95,25 @@ public enum ClipboardInserter {
         vDown?.post(tap: .cghidEventTap)
         vUp?.post(tap: .cghidEventTap)
         commandUp?.post(tap: .cghidEventTap)
+    }
+
+    /// 貼り付け直後に左矢印キーを `characterCount` 回送出してキャレットを戻す。
+    /// `postCommandV()` と同じ `CGEventSource`/`.cghidEventTap` の作法を踏襲する。
+    private static func moveCaretLeftIfNeeded(by characterCount: Int?) {
+        guard let characterCount, characterCount > 0, characterCount <= maxCaretMoveCount else {
+            return
+        }
+        guard let eventSource = CGEventSource(stateID: .combinedSessionState) else {
+            return
+        }
+        let leftArrowKeyCode: CGKeyCode = 0x7B // kVK_LeftArrow
+
+        for _ in 0..<characterCount {
+            let keyDown = CGEvent(keyboardEventSource: eventSource, virtualKey: leftArrowKeyCode, keyDown: true)
+            let keyUp = CGEvent(keyboardEventSource: eventSource, virtualKey: leftArrowKeyCode, keyDown: false)
+            keyDown?.post(tap: .cghidEventTap)
+            keyUp?.post(tap: .cghidEventTap)
+        }
     }
 
     private static func waitForPasteToSettle(

@@ -93,6 +93,22 @@ Two ways, both starting from a text selection in any app:
 
 In the editor you give the snippet a title, adjust the body, attach tags (existing or new), and optionally mark it as a favorite so it appears in the panel's Favorites section.
 
+### Placeholders
+
+A snippet body can include `{{ }}` placeholders that are filled in at the moment you insert the snippet. In the editor, a **Placeholders** panel sits right below the body field — click a placeholder to insert it at the cursor, or drag it to any spot in the body. You never have to type the braces yourself.
+
+| Placeholder | Expands to |
+| --- | --- |
+| `{{date}}`, `{{time}}`, `{{datetime}}` | The current date and/or time. Add `{{date:yyyy-MM-dd}}` for a custom format. |
+| `{{year}}`, `{{month}}`, `{{day}}`, `{{weekday}}` | Individual date components. |
+| `{{clipboard}}` | The current clipboard contents. |
+| `{{selection}}` | The text that was selected in the target app when you opened the panel. |
+| `{{app}}` | The name of the app you are inserting into. |
+| `{{uuid}}` | A freshly generated UUID. |
+| `{{cursor}}` | Leaves no visible text — marks where the cursor should land right after insertion. |
+
+Text that looks like a placeholder but is not on the list (`{{whatever}}`) is left untouched rather than silently deleted, so pasting code containing `{{` will not lose anything. Prefix a placeholder with a backslash (`\{{date}}`) to keep it as literal text instead of expanding it.
+
 ### The snippet list window
 
 Open it from the panel's **List** button or the menu bar — and give it a shortcut of its own in **Settings → Shortcut** if you use it often.

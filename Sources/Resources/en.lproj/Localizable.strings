@@ -41,6 +41,37 @@
 "editor.deleteConfirm.title" = "Delete this snippet?";
 "editor.deleteConfirm.message" = "This action cannot be undone.";
 
+/* Placeholders */
+"placeholder.section.title" = "Placeholders";
+"placeholder.hint" = "Click to insert at the cursor, or drag to insert at any position.";
+"placeholder.category.dateTime" = "Date & Time";
+"placeholder.category.context" = "Context";
+"placeholder.category.other" = "Other";
+"placeholder.date.name" = "Date";
+"placeholder.date.description" = "The date at insertion time (default yyyy/MM/dd). Use {{date:format}} to specify a format.";
+"placeholder.time.name" = "Time";
+"placeholder.time.description" = "The time at insertion time (default HH:mm). Use {{time:format}} to specify a format.";
+"placeholder.datetime.name" = "Date and Time";
+"placeholder.datetime.description" = "The date and time at insertion (default yyyy/MM/dd HH:mm). Use {{datetime:format}} to specify a format.";
+"placeholder.year.name" = "Year";
+"placeholder.year.description" = "The year at insertion time (4 digits).";
+"placeholder.month.name" = "Month";
+"placeholder.month.description" = "The month at insertion time (2 digits).";
+"placeholder.day.name" = "Day";
+"placeholder.day.description" = "The day at insertion time (2 digits).";
+"placeholder.weekday.name" = "Weekday";
+"placeholder.weekday.description" = "The weekday at insertion time.";
+"placeholder.clipboard.name" = "Clipboard";
+"placeholder.clipboard.description" = "Replaced with the clipboard contents at insertion time.";
+"placeholder.selection.name" = "Selection";
+"placeholder.selection.description" = "Replaced with the text that was selected when the panel was opened.";
+"placeholder.app.name" = "App Name";
+"placeholder.app.description" = "Replaced with the name of the frontmost app at the insertion target.";
+"placeholder.uuid.name" = "UUID";
+"placeholder.uuid.description" = "Replaced with a freshly generated UUID each time it is inserted.";
+"placeholder.cursor.name" = "Cursor Position";
+"placeholder.cursor.description" = "Marks where the cursor lands after insertion. Leaves no visible text.";
+
 /* Tag manager */
 "tagManager.title" = "Tags";
 "tagManager.empty" = "No tags yet.";

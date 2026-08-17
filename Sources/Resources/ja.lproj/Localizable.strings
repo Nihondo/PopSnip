@@ -41,6 +41,37 @@
 "editor.deleteConfirm.title" = "このスニペットを削除しますか？";
 "editor.deleteConfirm.message" = "この操作は取り消せません。";
 
+/* プレースホルダ */
+"placeholder.section.title" = "プレースホルダ";
+"placeholder.hint" = "クリックでカーソル位置に挿入、ドラッグで任意の位置に挿入できます。";
+"placeholder.category.dateTime" = "日時";
+"placeholder.category.context" = "文脈";
+"placeholder.category.other" = "その他";
+"placeholder.date.name" = "日付";
+"placeholder.date.description" = "挿入時の日付（既定は yyyy/MM/dd）。{{date:書式}} で書式を指定できます。";
+"placeholder.time.name" = "時刻";
+"placeholder.time.description" = "挿入時の時刻（既定は HH:mm）。{{time:書式}} で書式を指定できます。";
+"placeholder.datetime.name" = "日付と時刻";
+"placeholder.datetime.description" = "挿入時の日付と時刻（既定は yyyy/MM/dd HH:mm）。{{datetime:書式}} で書式を指定できます。";
+"placeholder.year.name" = "年";
+"placeholder.year.description" = "挿入時の年（4桁）。";
+"placeholder.month.name" = "月";
+"placeholder.month.description" = "挿入時の月（2桁）。";
+"placeholder.day.name" = "日";
+"placeholder.day.description" = "挿入時の日（2桁）。";
+"placeholder.weekday.name" = "曜日";
+"placeholder.weekday.description" = "挿入時の曜日。";
+"placeholder.clipboard.name" = "クリップボード";
+"placeholder.clipboard.description" = "挿入時のクリップボードの内容に置き換えます。";
+"placeholder.selection.name" = "選択範囲";
+"placeholder.selection.description" = "パネルを開いた時点で選択されていたテキストに置き換えます。";
+"placeholder.app.name" = "アプリ名";
+"placeholder.app.description" = "挿入先の前面アプリ名に置き換えます。";
+"placeholder.uuid.name" = "UUID";
+"placeholder.uuid.description" = "挿入のたびに新しく生成した UUID に置き換えます。";
+"placeholder.cursor.name" = "カーソル位置";
+"placeholder.cursor.description" = "挿入後のカーソル位置を指定します。表示テキストには残りません。";
+
 /* タグ管理 */
 "tagManager.title" = "タグ";
 "tagManager.empty" = "タグはまだありません。";

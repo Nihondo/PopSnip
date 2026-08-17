@@ -22,8 +22,13 @@ public enum AccessibilityInserter {
     /// クリップボードフォールバックへ進まないまま何も挿入されない不具合になる。
     /// そのため書き込み後に `kAXValueAttribute` を読み戻し、実際に値が変化したかを確認してから
     /// 成否を返す。
+    ///
+    /// - Parameter caretUTF16Offset: `{{cursor}}` プレースホルダが指定していたキャレット位置
+    ///   （`text` 先頭からの UTF-16 オフセット）。挿入の検証に成功した後、ベストエフォートで
+    ///   `kAXSelectedTextRangeAttribute` へ書き戻す。この属性を読み書きできない要素では
+    ///   キャレット位置の指定だけを諦め、挿入自体の成否には影響させない。
     @discardableResult
-    public static func insert(_ text: String, into focusedElement: AXUIElement) -> Bool {
+    public static func insert(_ text: String, into focusedElement: AXUIElement, caretUTF16Offset: Int? = nil) -> Bool {
         var isSettable: DarwinBoolean = false
         let settableStatus = AXUIElementIsAttributeSettable(
             focusedElement,
@@ -35,6 +40,8 @@ public enum AccessibilityInserter {
         }
 
         let valueBeforeInsertion = readValue(of: focusedElement)
+        // 挿入で置き換えられる選択範囲の開始位置。挿入後のキャレット位置はここからの相対オフセット。
+        let selectionRangeBeforeInsertion = selectionRange(of: focusedElement)
 
         let setStatus = AXUIElementSetAttributeValue(
             focusedElement,
@@ -45,7 +52,19 @@ public enum AccessibilityInserter {
             return false
         }
 
-        return verifyInsertionTookEffect(text, valueBeforeInsertion: valueBeforeInsertion, element: focusedElement)
+        let didInsert = verifyInsertionTookEffect(text, valueBeforeInsertion: valueBeforeInsertion, element: focusedElement)
+        guard didInsert else {
+            return false
+        }
+
+        if let caretUTF16Offset {
+            moveCaret(
+                of: focusedElement,
+                toOffset: caretUTF16Offset,
+                relativeToLocation: selectionRangeBeforeInsertion?.location ?? 0
+            )
+        }
+        return true
     }
 
     /// 書き込み後に値を読み戻し、実際に反映されたかを確認する。
@@ -84,5 +103,40 @@ public enum AccessibilityInserter {
             return nil
         }
         return FocusSnapshotResolver.normalizeTextValue(value)
+    }
+
+    // MARK: - キャレット位置
+
+    /// `kAXSelectedTextRangeAttribute` を読み取り、選択範囲（無ければ挿入点）を返す。
+    /// この属性を公開していない要素では nil。
+    private static func selectionRange(of element: AXUIElement) -> CFRange? {
+        guard
+            let value = FocusSnapshotResolver.copyAttributeValue(
+                of: element,
+                attribute: kAXSelectedTextRangeAttribute as CFString
+            ),
+            CFGetTypeID(value) == AXValueGetTypeID()
+        else {
+            return nil
+        }
+        let axValue = value as! AXValue // swiftlint:disable:this force_cast
+        guard AXValueGetType(axValue) == .cfRange else {
+            return nil
+        }
+        var range = CFRange(location: 0, length: 0)
+        guard AXValueGetValue(axValue, .cfRange, &range) else {
+            return nil
+        }
+        return range
+    }
+
+    /// 挿入後、`kAXSelectedTextRangeAttribute` へキャレット位置を書き戻す（ベストエフォート）。
+    /// 失敗しても挿入自体は既に完了しているため、呼び出し元には何も返さない。
+    private static func moveCaret(of element: AXUIElement, toOffset offset: Int, relativeToLocation baseLocation: Int) {
+        var newRange = CFRange(location: baseLocation + offset, length: 0)
+        guard let newRangeValue = AXValueCreate(.cfRange, &newRange) else {
+            return
+        }
+        AXUIElementSetAttributeValue(element, kAXSelectedTextRangeAttribute as CFString, newRangeValue)
     }
 }

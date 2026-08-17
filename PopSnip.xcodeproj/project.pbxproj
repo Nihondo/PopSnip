@@ -7,14 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02A144793D6E1286B9A2EB19 /* SnippetBodyTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACA7B0F28AAB379480ECF4D /* SnippetBodyTextView.swift */; };
 		06F33A055376B5B80ECAFD98 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025C61468D3BF670EE3B879B /* DesignTokens.swift */; };
 		07078A58B613ECB9261AFE19 /* AccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B8E2A8FE5177C8CA4754D /* AccessibilityPermission.swift */; };
+		09EC606440C3992C5FAD15D9 /* PlaceholderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731FE793BC184F22E7866A0E /* PlaceholderTests.swift */; };
 		0CA56064650D1B14FF532AC3 /* IMESafeSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */; };
 		0EBADA37A1BB882A15F88890 /* SnippetTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A92085458711C77C7CE771 /* SnippetTag.swift */; };
 		1720783BCFAC93F8972B13ED /* SnippetRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65853605E72D11ED5241B812 /* SnippetRowView.swift */; };
 		1C4F9C6E428F6FEF2A2CDCF4 /* ShortcutChangeNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345525B9C27DF7E5C50DF885 /* ShortcutChangeNotification.swift */; };
 		1CCB9BFC909E0AAE3D52ACA6 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC43078BE3B62AB664F90E0D /* SnippetStore.swift */; };
 		1D37FF026B461754C1675348 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2378DD408D94AD4EEF543F9 /* AppLogger.swift */; };
+		225A5303A30E8E1EF7307045 /* PlaceholderExpander.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B16F3B17DA392A057BD96C6 /* PlaceholderExpander.swift */; };
 		2571C1538FB2BCB2FD3AD5C9 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98F87651CB2DB9DFAFAF4087 /* SnippetStoreTests.swift */; };
 		2633CED19623A14E5D34B2F9 /* PanelFooterButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C270739096C864F1DFEF283 /* PanelFooterButtonStyle.swift */; };
 		2BD4ACEE415E5976C7D0EF1C /* TagChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1620B97F23F35CBA7085E706 /* TagChipView.swift */; };
@@ -22,18 +25,21 @@
 		3367655509FCA94C2CE76506 /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D4D46B7B64A8682B94EF3E /* Snippet.swift */; };
 		3BA7404074E78609F35A802B /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5C8835B5709CBA2F700C9A /* Localization.swift */; };
 		420B59719E8DB8A08B5B3753 /* SnippetLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B736AD617CD07D956DD8A1E /* SnippetLibrary.swift */; };
-		424E63F93032FF2B00DF1B18 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 424E63F83032FF2B00DF1B18 /* AppIcon.icon */; };
 		44CA8E429FBFFEFDD333A3A9 /* PanelPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EC31FF0535255EC56CF9BA /* PanelPreferences.swift */; };
+		4EE2568F09742030730A0C8E /* PlaceholderPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBAEBEAF278FA07F64324FC6 /* PlaceholderPaletteView.swift */; };
 		50F0A3BE475F01D770934FE1 /* SnippetPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */; };
 		51CFCA694E9934B8DD37BF5B /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */; };
 		535763C8305BB1AD15609796 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2409091F46EDE1F841DE459F /* TagManagerView.swift */; };
 		57BFE64B3096F0CBFBE14EA8 /* HighlightRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A49D959D06B15CD1F3E50A /* HighlightRange.swift */; };
 		5ED9C80CCD3D8DAD37278B7A /* SnippetSearchIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FC1EABF880DDED5557BEDF /* SnippetSearchIndex.swift */; };
 		5F5DE97F9AA825D59B4F47A7 /* SnippetSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */; };
+		645913107926BF3815C8DBD6 /* PlaceholderCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227197D9AF454BA96D8BC7ED /* PlaceholderCatalog.swift */; };
 		67C2454C962847C06ACF31B9 /* UpdateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */; };
 		6995E7E990FBE3741F2DC773 /* AccessibilityInserter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F6A7552603C41A6B28042C /* AccessibilityInserter.swift */; };
 		71B9A12D2D6575AFC684F4CA /* AppFontSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36879BC782CA4E30A4AB5ADB /* AppFontSize.swift */; };
 		74FB58E8466DBFF0877F2956 /* ShortcutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E572148634A39D309933E61 /* ShortcutSettingsView.swift */; };
+		7784D9C8C5590C21A3F35A37 /* PlaceholderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7840AFA99A8714E5C55AD285 /* PlaceholderContext.swift */; };
+		78F65B242A1697A0164E4BB6 /* PlaceholderParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59B950AF634568B7322D45B /* PlaceholderParser.swift */; };
 		7BE71C3A4E1D50EFF7FDE2D6 /* PopSnipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86705B4320DA0A0D4BD4EA8 /* PopSnipApp.swift */; };
 		7D4E048BBE9CDBEECC204212 /* AppSettingsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC6D097B5EEA2803536221 /* AppSettingsResolver.swift */; };
 		82B31EEF454DFB7E203439CA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572E96814EFC007DE981D4A7 /* SettingsView.swift */; };
@@ -83,11 +89,13 @@
 /* Begin PBXFileReference section */
 		025C61468D3BF670EE3B879B /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		04814C0409EAAA7AF0CDA6C2 /* SnippetPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanel.swift; sourceTree = "<group>"; };
+		0B16F3B17DA392A057BD96C6 /* PlaceholderExpander.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderExpander.swift; sourceTree = "<group>"; };
 		0D77749F4617D9A26209FEC9 /* AppFontSizeEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFontSizeEnvironment.swift; sourceTree = "<group>"; };
 		0E901DB87647316F8CB9FFBC /* TagFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFlowLayout.swift; sourceTree = "<group>"; };
 		1033127A5ACC79C196FE4EFE /* PanelLayoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelLayoutSettingsView.swift; sourceTree = "<group>"; };
 		1620B97F23F35CBA7085E706 /* TagChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChipView.swift; sourceTree = "<group>"; };
 		21584A2D231F55DD730138EE /* SnippetListWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListWindowView.swift; sourceTree = "<group>"; };
+		227197D9AF454BA96D8BC7ED /* PlaceholderCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderCatalog.swift; sourceTree = "<group>"; };
 		232A5DDAE0509F9E056ADE78 /* PopSnipShortcutAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopSnipShortcutAction.swift; sourceTree = "<group>"; };
 		2409091F46EDE1F841DE459F /* TagManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagManagerView.swift; sourceTree = "<group>"; };
 		29FD76342E46857A754C2CA4 /* SnippetListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListWindowController.swift; sourceTree = "<group>"; };
@@ -97,7 +105,6 @@
 		38B95712B9827184CD3931EA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3B736AD617CD07D956DD8A1E /* SnippetLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetLibrary.swift; sourceTree = "<group>"; };
 		3C89CFC9547BC1204748E5AD /* DevelopmentTeam.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevelopmentTeam.xcconfig; sourceTree = "<group>"; };
-		424E63F83032FF2B00DF1B18 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		443CA035B2EBAB6AD3673A25 /* SnippetEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorWindowController.swift; sourceTree = "<group>"; };
 		44E264FD3D6202EAE5ECC7DF /* GlobalShortcutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcutService.swift; sourceTree = "<group>"; };
 		4FC592124156B0C381445BA0 /* IMESafeSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMESafeSearchField.swift; sourceTree = "<group>"; };
@@ -110,8 +117,10 @@
 		66BD23DFEEEB844ECF4FE946 /* PermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionView.swift; sourceTree = "<group>"; };
 		6A608A5329F7D0E2499AFC8C /* SnippetSearchEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSearchEngineTests.swift; sourceTree = "<group>"; };
 		711398CDEE7FF3485093EB18 /* AppUpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateController.swift; sourceTree = "<group>"; };
+		731FE793BC184F22E7866A0E /* PlaceholderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTests.swift; sourceTree = "<group>"; };
 		74D4D46B7B64A8682B94EF3E /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
 		770A409AC8CD67821C0AEF27 /* InsertionTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertionTarget.swift; sourceTree = "<group>"; };
+		7840AFA99A8714E5C55AD285 /* PlaceholderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderContext.swift; sourceTree = "<group>"; };
 		7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		7E572148634A39D309933E61 /* ShortcutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsView.swift; sourceTree = "<group>"; };
 		7FFB800CECAB88E5D00D7F14 /* PopSnip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopSnip.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -140,10 +149,13 @@
 		D946FFA0F32D98C5EE237679 /* SnippetPanelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPanelViewModel.swift; sourceTree = "<group>"; };
 		D982C51F8228B3ECA4D58150 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		DA5C8835B5709CBA2F700C9A /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		DACA7B0F28AAB379480ECF4D /* SnippetBodyTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetBodyTextView.swift; sourceTree = "<group>"; };
 		E1613116158D85AB858BF0BC /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
 		E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsView.swift; sourceTree = "<group>"; };
 		EAB7694AE09BA2621A7577A7 /* BulkTagPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulkTagPopoverView.swift; sourceTree = "<group>"; };
+		EBAEBEAF278FA07F64324FC6 /* PlaceholderPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPaletteView.swift; sourceTree = "<group>"; };
 		EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSearchEngine.swift; sourceTree = "<group>"; };
+		F59B950AF634568B7322D45B /* PlaceholderParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderParser.swift; sourceTree = "<group>"; };
 		F887A6CA6F6DDEC32FF4E7F2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -195,6 +207,8 @@
 			isa = PBXGroup;
 			children = (
 				EAB7694AE09BA2621A7577A7 /* BulkTagPopoverView.swift */,
+				EBAEBEAF278FA07F64324FC6 /* PlaceholderPaletteView.swift */,
+				DACA7B0F28AAB379480ECF4D /* SnippetBodyTextView.swift */,
 				E1613116158D85AB858BF0BC /* SnippetEditorView.swift */,
 				443CA035B2EBAB6AD3673A25 /* SnippetEditorWindowController.swift */,
 				29FD76342E46857A754C2CA4 /* SnippetListWindowController.swift */,
@@ -212,6 +226,17 @@
 				81316AB4425AED3F1E520690 /* PopSnipTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		16AD2B2819131CF892CAA1A4 /* Placeholder */ = {
+			isa = PBXGroup;
+			children = (
+				227197D9AF454BA96D8BC7ED /* PlaceholderCatalog.swift */,
+				7840AFA99A8714E5C55AD285 /* PlaceholderContext.swift */,
+				0B16F3B17DA392A057BD96C6 /* PlaceholderExpander.swift */,
+				F59B950AF634568B7322D45B /* PlaceholderParser.swift */,
+			);
+			path = Placeholder;
 			sourceTree = "<group>";
 		};
 		378A4C4A153DE6CF54663898 /* Search */ = {
@@ -249,6 +274,7 @@
 		80E775CED0D90C3D16503F85 /* PopSnipTests */ = {
 			isa = PBXGroup;
 			children = (
+				731FE793BC184F22E7866A0E /* PlaceholderTests.swift */,
 				D58B10C162E0DF339FA7B586 /* SnippetLibraryCodableTests.swift */,
 				6A608A5329F7D0E2499AFC8C /* SnippetSearchEngineTests.swift */,
 				98F87651CB2DB9DFAFAF4087 /* SnippetStoreTests.swift */,
@@ -267,7 +293,6 @@
 		B5849918AC4F04FDC154B52B = {
 			isa = PBXGroup;
 			children = (
-				424E63F83032FF2B00DF1B18 /* AppIcon.icon */,
 				4099C9FBDFD3ED58C2A09B28 /* Configurations */,
 				80E775CED0D90C3D16503F85 /* PopSnipTests */,
 				F9A79FC892664658B8175C40 /* Sources */,
@@ -280,6 +305,7 @@
 			children = (
 				E1BBBAD141809CCF797CD188 /* Insertion */,
 				D99088C0A6F0D5C3EE2DEC8A /* Models */,
+				16AD2B2819131CF892CAA1A4 /* Placeholder */,
 				378A4C4A153DE6CF54663898 /* Search */,
 				0138DCDF0978D7CA35A97C09 /* Settings */,
 				D3C8E71ABE0FF32BD8FB10D6 /* Shortcut */,
@@ -460,7 +486,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A30403076F7B30A7936AA57A /* Localizable.strings in Resources */,
-				424E63F93032FF2B00DF1B18 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +496,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09EC606440C3992C5FAD15D9 /* PlaceholderTests.swift in Sources */,
 				326C70369AE57EB513C76680 /* SnippetLibraryCodableTests.swift in Sources */,
 				8D1CF3B132415D03AD4A96F8 /* SnippetSearchEngineTests.swift in Sources */,
 				2571C1538FB2BCB2FD3AD5C9 /* SnippetStoreTests.swift in Sources */,
@@ -507,6 +533,11 @@
 				D38BF624DCDE1CDDB6F11C0C /* PanelSection.swift in Sources */,
 				9C38336639DDFD8EBB79D42F /* PanelShortcutConfiguration.swift in Sources */,
 				93D475E4C862A00AFB20AE95 /* PermissionView.swift in Sources */,
+				645913107926BF3815C8DBD6 /* PlaceholderCatalog.swift in Sources */,
+				7784D9C8C5590C21A3F35A37 /* PlaceholderContext.swift in Sources */,
+				225A5303A30E8E1EF7307045 /* PlaceholderExpander.swift in Sources */,
+				4EE2568F09742030730A0C8E /* PlaceholderPaletteView.swift in Sources */,
+				78F65B242A1697A0164E4BB6 /* PlaceholderParser.swift in Sources */,
 				7BE71C3A4E1D50EFF7FDE2D6 /* PopSnipApp.swift in Sources */,
 				E5E5D98467515BD864388CAA /* PopSnipShortcutAction.swift in Sources */,
 				82B31EEF454DFB7E203439CA /* SettingsView.swift in Sources */,
@@ -514,6 +545,7 @@
 				1C4F9C6E428F6FEF2A2CDCF4 /* ShortcutChangeNotification.swift in Sources */,
 				74FB58E8466DBFF0877F2956 /* ShortcutSettingsView.swift in Sources */,
 				3367655509FCA94C2CE76506 /* Snippet.swift in Sources */,
+				02A144793D6E1286B9A2EB19 /* SnippetBodyTextView.swift in Sources */,
 				8F6846EDBCD59477A5CDC4AA /* SnippetEditorView.swift in Sources */,
 				9B7E10ACD4CD8BBD24B9A87E /* SnippetEditorWindowController.swift in Sources */,
 				A33713FF9899E5088E15918D /* SnippetInsertionService.swift in Sources */,
@@ -600,7 +632,7 @@
 				CODE_SIGN_ENTITLEMENTS = PopSnip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = UAC4B833KN;
@@ -624,7 +656,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.9.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -676,7 +708,7 @@
 				CODE_SIGN_ENTITLEMENTS = PopSnip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = UAC4B833KN;
@@ -694,7 +726,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -750,7 +782,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
@@ -758,7 +789,6 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;
@@ -770,7 +800,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
@@ -778,7 +807,6 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmng.popsnip.PopSnip;
 				PRODUCT_NAME = PopSnip;
 				SDKROOT = macosx;

@@ -46,4 +46,10 @@ public enum UserDefaultsKeys {
     // MARK: - スニペットストレージ
 
     public static let snippetFilePath = "storage.snippetFilePath"
+
+    // MARK: - 編集画面
+
+    /// プレースホルダガイダンスパレットの開閉状態（純粋な UI 表示状態のため
+    /// AppSettingsResolver を経由せず @AppStorage で直接読み書きする）。
+    public static let placeholderPaletteExpanded = "editor.placeholderPaletteExpanded"
 }

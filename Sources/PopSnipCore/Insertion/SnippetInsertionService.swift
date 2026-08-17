@@ -31,12 +31,18 @@ public enum SnippetInsertionService {
     ///   - target: パネル表示直前に取得したスナップショット。
     ///   - strategy: 挿入方式。既定は自動フォールバック。
     ///   - clipboardRestoreDelayMs: Clipboard 経由時の貼り付け待機時間（設定で調整可能にする前提）。
+    ///   - caretUTF16Offset: `{{cursor}}` が指定していたキャレット位置（挿入テキスト先頭からの
+    ///     UTF-16 オフセット）。Accessibility 経路で使う。プレースホルダを含まない呼び出しでは nil。
+    ///   - caretCharacterOffsetFromEnd: 同じ位置を「挿入テキスト末尾から何文字戻るか」で表したもの。
+    ///     Clipboard 経路（左矢印キー送出）で使う。
     @discardableResult
     public static func insert(
         _ text: String,
         into target: InsertionTarget,
         strategy: InsertionStrategy = .automatic,
-        clipboardRestoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs
+        clipboardRestoreDelayMs: Int = ClipboardInserter.defaultRestoreDelayMs,
+        caretUTF16Offset: Int? = nil,
+        caretCharacterOffsetFromEnd: Int? = nil
     ) -> InsertionResult {
         guard target.isInsertionForbidden == false else {
             return .blockedBySecurity
@@ -56,19 +62,27 @@ public enum SnippetInsertionService {
             guard let focusedElement = freshTarget.focusedElement else {
                 return .noFocusedTarget
             }
-            let didInsert = AccessibilityInserter.insert(text, into: focusedElement)
+            let didInsert = AccessibilityInserter.insert(text, into: focusedElement, caretUTF16Offset: caretUTF16Offset)
             return didInsert ? .insertedViaAccessibility : .noFocusedTarget
 
         case .clipboardOnly:
-            ClipboardInserter.insert(text, restoreDelayMs: clipboardRestoreDelayMs)
+            ClipboardInserter.insert(
+                text,
+                restoreDelayMs: clipboardRestoreDelayMs,
+                caretCharacterOffsetFromEnd: caretCharacterOffsetFromEnd
+            )
             return .insertedViaClipboard
 
         case .automatic:
             if let focusedElement = freshTarget.focusedElement,
-               AccessibilityInserter.insert(text, into: focusedElement) {
+               AccessibilityInserter.insert(text, into: focusedElement, caretUTF16Offset: caretUTF16Offset) {
                 return .insertedViaAccessibility
             }
-            ClipboardInserter.insert(text, restoreDelayMs: clipboardRestoreDelayMs)
+            ClipboardInserter.insert(
+                text,
+                restoreDelayMs: clipboardRestoreDelayMs,
+                caretCharacterOffsetFromEnd: caretCharacterOffsetFromEnd
+            )
             return .insertedViaClipboard
         }
     }
