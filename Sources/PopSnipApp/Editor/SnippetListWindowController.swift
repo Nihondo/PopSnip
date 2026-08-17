@@ -7,6 +7,7 @@ import SwiftUI
 @MainActor
 final class SnippetListWindowController: NSWindowController {
     private static let windowIdentifier = NSUserInterfaceItemIdentifier("snippetList")
+    private static let frameAutosaveName = "PopSnip.SnippetListWindow"
 
     private let store: SnippetStore
 
@@ -41,7 +42,12 @@ final class SnippetListWindowController: NSWindowController {
         newWindow.styleMask = [.titled, .closable, .resizable]
         newWindow.isReleasedWhenClosed = false
         newWindow.isRestorable = false
-        newWindow.center()
+        // setFrameAutosaveName はリサイズ・移動のたびに frame を自動保存し、
+        // 呼び出し時点で保存済みデータがあれば直ちに復元する（戻り値で判定可能）。
+        let didRestoreFrame = newWindow.setFrameAutosaveName(Self.frameAutosaveName)
+        if !didRestoreFrame {
+            newWindow.center()
+        }
         return newWindow
     }
 }

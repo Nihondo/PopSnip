@@ -84,10 +84,6 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         panel.hidesOnDeactivate = false
         panel.isMovableByWindowBackground = true
         panel.animationBehavior = .utilityWindow
-        panel.minSize = NSSize(
-            width: DesignTokens.WindowSize.panelMinWidth,
-            height: DesignTokens.WindowSize.panelMinHeight
-        )
 
         let viewModel = SnippetPanelViewModel(
             store: store,
@@ -121,8 +117,21 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             }
         )
         let hostingView = NSHostingView(rootView: panelView.environment(\.appFontSize, preferences.fontSize))
+        // fittingSize の評価と setContentSize は、hostingView を panel.contentView に
+        // 代入する「前」に行う。SnippetPanelView は `.frame(minHeight: panelMinHeight)` を
+        // 持つため、window に紐付いた状態で fittingSize/レイアウトパスが走ると、AppKit が
+        // 一旦 minHeight（220pt）までウインドウを自動リサイズしてしまい、その拡大が
+        // windowDidResize を発火させて直前に保存していたユーザーの希望サイズを
+        // panelMinHeight で上書きしてしまう不具合があった（リサイズしても再現しない原因）。
+        // contentView 未代入の状態なら fittingSize の評価が window に影響しないため、
+        // 先にサイズを確定させてから contentView をセットする。
+        let resolvedSize = resolvePanelContentSize(fittingSize: hostingView.fittingSize)
+        panel.setContentSize(resolvedSize)
+        panel.minSize = NSSize(
+            width: DesignTokens.WindowSize.panelMinWidth,
+            height: DesignTokens.WindowSize.panelMinHeight
+        )
         panel.contentView = hostingView
-        panel.setContentSize(resolvePanelContentSize(fittingSize: hostingView.fittingSize))
         configurePanelShape(panel)
 
         activePanel = panel
