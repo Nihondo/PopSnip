@@ -53,6 +53,12 @@ final class StatusBarController: NSObject {
     func refreshMenu() {
         let menu = NSMenu()
 
+        menu.addItem(makeItem(
+                titleKey: "menu.openSettings",
+                symbolName: "gearshape",
+                action: #selector(handleOpenSettings)
+        ))
+        menu.addItem(.separator())
         menu.addItem(makeShortcutItem(
             titleKey: "menu.showPanel",
             symbolName: "magnifyingglass",
@@ -72,11 +78,6 @@ final class StatusBarController: NSObject {
             action: #selector(handleCheckForUpdates)
         ))
         menu.addItem(.separator())
-        menu.addItem(makeItem(
-            titleKey: "menu.openSettings",
-            symbolName: "gearshape",
-            action: #selector(handleOpenSettings)
-        ))
         menu.addItem(makeItem(
             titleKey: "menu.about",
             symbolName: "info.circle",
