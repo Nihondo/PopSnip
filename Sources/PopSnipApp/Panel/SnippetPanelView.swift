@@ -146,8 +146,8 @@ struct SnippetPanelView: View {
             if recentSnippets.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.recents"))
                 ForEach(recentSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
-                        .id(PanelListItem.snippetItemID(snippet.id))
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
+                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
                 }
             }
         case .allSnippets:
@@ -155,8 +155,8 @@ struct SnippetPanelView: View {
             if allSnippets.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.allSnippets"))
                 ForEach(allSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
-                        .id(PanelListItem.snippetItemID(snippet.id))
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
+                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
                 }
             }
         case .favorites:
@@ -164,8 +164,8 @@ struct SnippetPanelView: View {
             if favoriteSnippets.isEmpty == false {
                 sectionHeader(L10n.string("panel.section.favorites"))
                 ForEach(favoriteSnippets) { snippet in
-                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id))
-                        .id(PanelListItem.snippetItemID(snippet.id))
+                    rowView(for: snippet, at: viewModel.globalIndex(ofSnippetID: snippet.id, context: section.rawValue))
+                        .id(PanelListItem.snippetItemID(snippet.id, context: section.rawValue))
                 }
             }
         }
@@ -192,7 +192,7 @@ struct SnippetPanelView: View {
                 isSelected: index == viewModel.highlightedIndex
             )
             .onTapGesture { viewModel.drillIntoTag(tag.id) }
-        case .snippet(let match):
+        case .snippet(let match, _):
             SnippetRowView(
                 snippet: match.snippet,
                 tags: viewModel.tags(for: match.snippet),

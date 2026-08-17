@@ -18,7 +18,12 @@ enum PanelListItem: Identifiable {
     /// タグドリルダウン中の「< タグ名, タグ名, ...」行。クリックだけでなくカーソルキーでも選択できる。
     case backToParent
     case tag(SnippetTag, snippetCount: Int)
-    case snippet(SnippetSearchMatch)
+    /// `context` は同じスニペットが複数セクション（例: 最近使用したスニペット と
+    /// すべてのスニペット）に重複して現れる場合に `id` を一意にするための識別子
+    /// （通常は `PanelSection.rawValue`）。これが無いと同じスニペットの行が同じ
+    /// `.id()` を持つビューとして複数箇所に存在してしまい、SwiftUI 側でビュー識別が
+    /// 衝突して片方が描画されなくなる不具合があった。
+    case snippet(SnippetSearchMatch, context: String)
 
     var id: String {
         switch self {
@@ -26,8 +31,8 @@ enum PanelListItem: Identifiable {
             return "back-to-parent"
         case .tag(let tag, _):
             return Self.tagItemID(tag.id)
-        case .snippet(let match):
-            return Self.snippetItemID(match.snippet.id)
+        case .snippet(let match, let context):
+            return Self.snippetItemID(match.snippet.id, context: context)
         }
     }
 
@@ -38,8 +43,8 @@ enum PanelListItem: Identifiable {
         "tag-\(tagID.uuidString)"
     }
 
-    static func snippetItemID(_ snippetID: UUID) -> String {
-        "snippet-\(snippetID.uuidString)"
+    static func snippetItemID(_ snippetID: UUID, context: String) -> String {
+        "snippet-\(context)-\(snippetID.uuidString)"
     }
 }
 
@@ -95,7 +100,7 @@ final class SnippetPanelViewModel: ObservableObject {
     /// 現在表示されている項目一覧。キー操作のインデックス解決に使う。
     var listItems: [PanelListItem] {
         if isSearching {
-            return searchMatches.map { .snippet($0) }
+            return searchMatches.map { .snippet($0, context: "search") }
         }
 
         if isDrilledDown {
@@ -105,7 +110,7 @@ final class SnippetPanelViewModel: ObservableObject {
                 contentsOf: subTagCandidates(in: filteredSnippets, excluding: selectedTagIDs)
                     .map { .tag($0.tag, snippetCount: $0.count) }
             )
-            items.append(contentsOf: filteredSnippets.map { .snippet(emptyMatch(for: $0)) })
+            items.append(contentsOf: filteredSnippets.map { .snippet(emptyMatch(for: $0), context: "drilldown") })
             return items
         }
 
@@ -121,11 +126,17 @@ final class SnippetPanelViewModel: ObservableObject {
                         .map { .tag($0, snippetCount: globalCounts[$0.id] ?? 0) }
                 )
             case .recents:
-                items.append(contentsOf: recentSnippets().map { .snippet(emptyMatch(for: $0)) })
+                items.append(
+                    contentsOf: recentSnippets().map { .snippet(emptyMatch(for: $0), context: section.rawValue) }
+                )
             case .allSnippets:
-                items.append(contentsOf: allSnippets().map { .snippet(emptyMatch(for: $0)) })
+                items.append(
+                    contentsOf: allSnippets().map { .snippet(emptyMatch(for: $0), context: section.rawValue) }
+                )
             case .favorites:
-                items.append(contentsOf: favoriteSnippets().map { .snippet(emptyMatch(for: $0)) })
+                items.append(
+                    contentsOf: favoriteSnippets().map { .snippet(emptyMatch(for: $0), context: section.rawValue) }
+                )
             }
         }
         return items
@@ -217,7 +228,7 @@ final class SnippetPanelViewModel: ObservableObject {
             goBackOneLevel()
         case .tag(let tag, _):
             drillIntoTag(tag.id)
-        case .snippet(let match):
+        case .snippet(let match, _):
             onSelectSnippet(match.snippet)
         }
     }
@@ -288,10 +299,13 @@ final class SnippetPanelViewModel: ObservableObject {
         store.toggleFavorite(id: snippetID)
     }
 
-    func globalIndex(ofSnippetID id: UUID) -> Int {
+    /// `context` はスニペットが属するセクション（`PanelSection.rawValue`）。同じスニペットが
+    /// 複数セクションに重複して現れうるため、`context` を指定しないと常に最初に見つかった
+    /// セクション内の位置を返してしまい、他セクションの行のキー操作インデックスがずれる。
+    func globalIndex(ofSnippetID id: UUID, context: String) -> Int {
         listItems.firstIndex { item in
-            if case .snippet(let match) = item {
-                return match.snippet.id == id
+            if case .snippet(let match, let itemContext) = item {
+                return match.snippet.id == id && itemContext == context
             }
             return false
         } ?? 0
