@@ -2,6 +2,8 @@
 
 PopSnip is a lightweight macOS menu bar app for storing text snippets and inserting them into any app with a global keyboard shortcut — a fast, Spotlight-style search panel for your everyday boilerplate text.
 
+![](images/popsnip_sample.png)
+
 ## Features
 
 - **Global shortcut search panel** — press a shortcut (default `⌥⌘Space`) anywhere to open a search box near your cursor
