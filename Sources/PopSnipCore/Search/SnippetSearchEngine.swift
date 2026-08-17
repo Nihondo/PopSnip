@@ -26,6 +26,10 @@ public enum SnippetSearchEngine {
 
     /// `query` に一致するスニペットを、`sortOrder` に従って並び替えて返す。
     /// `query` が空文字の場合は空配列を返す（呼び出し側でセクション表示に切り替える）。
+    ///
+    /// この形は呼び出しのたびに `tags` から検索用インデックスを組み立てる。
+    /// 同じライブラリに対して繰り返し検索する場合は、インデックスを使い回せる
+    /// `search(query:in:index:sortOrder:limit:now:)` を使うほうが小文字化の再計算を避けられる。
     public static func search(
         query: String,
         in snippets: [Snippet],
@@ -38,10 +42,36 @@ public enum SnippetSearchEngine {
         guard trimmedQuery.isEmpty == false else {
             return []
         }
+        let index = SnippetSearchIndex(snippets: snippets, tags: tags)
+        return search(
+            query: trimmedQuery,
+            in: snippets,
+            index: index,
+            sortOrder: sortOrder,
+            limit: limit,
+            now: now
+        )
+    }
 
-        let tagsByID = Dictionary(uniqueKeysWithValues: tags.map { ($0.id, $0) })
+    /// 事前構築済みの `SnippetSearchIndex` を使って検索する。
+    /// タイトル・本文・タグ名の小文字化を検索のたびに繰り返さずに済むため、
+    /// 同じライブラリへ何度も検索をかける呼び出し元（検索パネルなど）向け。
+    public static func search(
+        query: String,
+        in snippets: [Snippet],
+        index: SnippetSearchIndex,
+        sortOrder: SearchSortOrder,
+        limit: Int,
+        now: Date = Date()
+    ) -> [SnippetSearchMatch] {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmedQuery.isEmpty == false else {
+            return []
+        }
+
+        let lowerQuery = trimmedQuery.lowercased()
         let matches = snippets.compactMap { snippet in
-            matchScore(query: trimmedQuery, snippet: snippet, tagsByID: tagsByID, now: now)
+            matchScore(lowerQuery: lowerQuery, snippet: snippet, index: index, now: now)
         }
         let sortedMatches = sort(matches, order: sortOrder)
         return Array(sortedMatches.prefix(limit))
@@ -50,29 +80,35 @@ public enum SnippetSearchEngine {
     // MARK: - スコアリング
 
     private static func matchScore(
-        query: String,
+        lowerQuery: String,
         snippet: Snippet,
-        tagsByID: [UUID: SnippetTag],
+        index: SnippetSearchIndex,
         now: Date
     ) -> SnippetSearchMatch? {
         var score = 0.0
 
-        let titleHighlights = findRanges(of: query, in: snippet.displayTitle)
+        // インデックスに未登録のスニペット（呼び出し元が古いインデックスを渡した場合など）は
+        // その場で小文字化してフォールバックし、結果の正しさを優先する。
+        let texts = index.textsBySnippetID[snippet.id]
+        let lowerTitle = texts?.lowerTitle ?? snippet.displayTitle.lowercased()
+        let lowerBody = texts?.lowerBody ?? snippet.body.lowercased()
+
+        let titleHighlights = findRanges(lowerQuery: lowerQuery, lowerText: lowerTitle)
         if titleHighlights.isEmpty == false {
             score += titleMatchWeight
         }
 
-        let bodyHighlights = findRanges(of: query, in: snippet.body)
+        let bodyHighlights = findRanges(lowerQuery: lowerQuery, lowerText: lowerBody)
         if bodyHighlights.isEmpty == false {
             score += bodyMatchWeight
         }
 
         var tagHighlights: [UUID: [HighlightRange]] = [:]
         for tagID in snippet.tagIDs {
-            guard let tag = tagsByID[tagID] else {
+            guard let lowerTagName = index.lowerTagNamesByTagID[tagID] else {
                 continue
             }
-            let ranges = findRanges(of: query, in: tag.name)
+            let ranges = findRanges(lowerQuery: lowerQuery, lowerText: lowerTagName)
             guard ranges.isEmpty == false else {
                 continue
             }
@@ -99,13 +135,12 @@ public enum SnippetSearchEngine {
         )
     }
 
-    /// `text` 中で `query`（大文字小文字を無視）に一致する箇所をすべて返す。
-    private static func findRanges(of query: String, in text: String) -> [HighlightRange] {
-        guard query.isEmpty == false, text.isEmpty == false else {
+    /// 小文字化済みの `lowerText` 中で `lowerQuery` に一致する箇所をすべて返す。
+    /// 呼び出し元が事前に小文字化を済ませておくことで、検索1回あたりの再計算を避ける。
+    private static func findRanges(lowerQuery: String, lowerText: String) -> [HighlightRange] {
+        guard lowerQuery.isEmpty == false, lowerText.isEmpty == false else {
             return []
         }
-        let lowerText = text.lowercased()
-        let lowerQuery = query.lowercased()
 
         var ranges: [HighlightRange] = []
         var searchStartIndex = lowerText.startIndex

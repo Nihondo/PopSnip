@@ -9,11 +9,21 @@ import OSLog
 /// スニペットライブラリの永続化ストア。
 @MainActor
 public final class SnippetStore: ObservableObject {
-    @Published public private(set) var library: SnippetLibrary
+    @Published public private(set) var library: SnippetLibrary {
+        didSet {
+            revision += 1
+            cachedSearchIndex = nil
+        }
+    }
+
+    /// `library` が変更されるたびに単調増加するリビジョン番号。
+    /// 呼び出し側（検索結果キャッシュなど）が「このリビジョンでは計算済みか」を判定するのに使う。
+    public private(set) var revision = 0
 
     public let fileURL: URL
     private var lastKnownModificationDate: Date?
     private let fileManager: FileManager
+    private var cachedSearchIndex: SnippetSearchIndex?
 
     public init(fileURL: URL? = nil, fileManager: FileManager = .default) {
         let resolvedURL = fileURL ?? SnippetStore.defaultFileURL()
@@ -21,6 +31,17 @@ public final class SnippetStore: ObservableObject {
         self.fileManager = fileManager
         self.library = SnippetStore.load(from: resolvedURL, fileManager: fileManager) ?? .empty
         self.lastKnownModificationDate = SnippetStore.modificationDate(of: resolvedURL, fileManager: fileManager)
+    }
+
+    /// 検索用インデックスを返す。`library` が前回構築時から変わっていなければ再利用する。
+    /// タイトル・本文・タグ名の小文字化を、キーストロークのたびではなくライブラリ更新のたびに1回で済ませるため。
+    public func searchIndex() -> SnippetSearchIndex {
+        if let cachedSearchIndex {
+            return cachedSearchIndex
+        }
+        let index = SnippetSearchIndex(snippets: library.snippets, tags: library.tags)
+        cachedSearchIndex = index
+        return index
     }
 
     /// 既定の保存先。設定でカスタムパスが指定されていればそちらを優先する。

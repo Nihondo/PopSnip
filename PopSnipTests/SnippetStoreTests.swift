@@ -50,6 +50,67 @@ struct SnippetStoreTests {
         #expect(updatedSnippet?.usageCount == 1)
         #expect(updatedSnippet?.lastUsedAt != nil)
     }
+
+    // MARK: - revision / 検索インデックス
+
+    @Test("library を変更するすべての操作で revision が単調増加する")
+    func revisionIncreasesOnEveryLibraryMutation() {
+        let store = makeTemporaryStore()
+        var previousRevision = store.revision
+
+        let tag = store.createTag(name: "リビジョン確認用")
+        #expect(store.revision > previousRevision)
+        previousRevision = store.revision
+
+        let snippet = Snippet(body: "本文", tagIDs: [tag.id])
+        store.upsertSnippet(snippet)
+        #expect(store.revision > previousRevision)
+        previousRevision = store.revision
+
+        store.recordUsage(of: snippet.id)
+        #expect(store.revision > previousRevision)
+        previousRevision = store.revision
+
+        store.toggleFavorite(id: snippet.id)
+        #expect(store.revision > previousRevision)
+        previousRevision = store.revision
+
+        store.deleteTag(id: tag.id)
+        #expect(store.revision > previousRevision)
+        previousRevision = store.revision
+
+        store.deleteSnippet(id: snippet.id)
+        #expect(store.revision > previousRevision)
+    }
+
+    @Test("外部編集を検知した再読み込みでも revision が上がり、検索インデックスが作り直される")
+    func reloadIfNeededIncrementsRevisionWhenFileChangesExternally() throws {
+        let store = makeTemporaryStore()
+        store.upsertSnippet(Snippet(body: "初期"))
+        let revisionBeforeExternalEdit = store.revision
+        let indexBeforeExternalEdit = store.searchIndex()
+
+        // 外部エディタでの書き換えを模して、ファイルを直接上書きし mtime を進める。
+        let externalSnippet = Snippet(title: "外部編集タイトル", body: "外部編集本文")
+        let externalLibrary = SnippetLibrary(snippets: [externalSnippet], tags: [])
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        try encoder.encode(externalLibrary).write(to: store.fileURL)
+        let futureModificationDate = Date().addingTimeInterval(5)
+        try FileManager.default.setAttributes(
+            [.modificationDate: futureModificationDate],
+            ofItemAtPath: store.fileURL.path
+        )
+
+        store.reloadIfNeeded()
+
+        #expect(store.revision > revisionBeforeExternalEdit)
+        #expect(store.library.snippets.map(\.id) == [externalSnippet.id])
+
+        let indexAfterExternalEdit = store.searchIndex()
+        #expect(indexBeforeExternalEdit.textsBySnippetID[externalSnippet.id] == nil)
+        #expect(indexAfterExternalEdit.textsBySnippetID[externalSnippet.id]?.lowerTitle == "外部編集タイトル")
+    }
 }
 
 @Suite("TagColorAssigner")

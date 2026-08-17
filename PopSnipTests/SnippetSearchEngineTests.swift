@@ -84,6 +84,47 @@ struct SnippetSearchEngineTests {
 
         #expect(results.first?.snippet.id == moreUsed.id)
     }
+
+    @Test("SnippetSearchIndex を使った検索は、都度小文字化する版と完全に同じ結果を返す")
+    func indexedSearchMatchesLegacySearchExactly() {
+        let awsTag = SnippetTag(name: "AWS", colorHex: "#7799DD")
+        let gitTag = SnippetTag(name: "Git", colorHex: "#16A34A")
+        let snippets = [
+            Snippet(title: "AWS デプロイ", body: "aws s3 sync", tagIDs: [awsTag.id], usageCount: 3),
+            Snippet(
+                title: "Git コミット",
+                body: "git commit -m aws-fix",
+                tagIDs: [gitTag.id],
+                usageCount: 10,
+                lastUsedAt: Date()
+            ),
+            Snippet(body: "無関係な本文")
+        ]
+        let tags = [awsTag, gitTag]
+        let now = Date()
+
+        for sortOrder: SearchSortOrder in [.relevance, .usageCount, .updatedAt] {
+            let legacyResults = SnippetSearchEngine.search(
+                query: "aWs",
+                in: snippets,
+                tags: tags,
+                sortOrder: sortOrder,
+                limit: 10,
+                now: now
+            )
+            let index = SnippetSearchIndex(snippets: snippets, tags: tags)
+            let indexedResults = SnippetSearchEngine.search(
+                query: "aWs",
+                in: snippets,
+                index: index,
+                sortOrder: sortOrder,
+                limit: 10,
+                now: now
+            )
+
+            #expect(legacyResults == indexedResults)
+        }
+    }
 }
 
 @Suite("タグ候補とパネル選択", .serialized)
@@ -260,6 +301,43 @@ struct SnippetPanelTagNavigationTests {
         )
 
         #expect(viewModel.visibleTagCandidates.map(\.id) == [newer.id, older.id, firstUnused.id, lastUnused.id])
+    }
+
+    @Test("トップレベルのタグ候補は件数0のタグも表示し続ける")
+    func topLevelTagCandidatesIncludeUnusedTags() {
+        let used = SnippetTag(name: "used", colorHex: "#7799DD")
+        let unused = SnippetTag(name: "unused", colorHex: "#16A34A")
+        let snippet = Snippet(body: "body", tagIDs: [used.id])
+        let viewModel = makeViewModel(tags: [used, unused], snippets: [snippet])
+
+        let candidatesByID = Dictionary(uniqueKeysWithValues: viewModel.visibleTagCandidates.map { ($0.id, $0) })
+
+        #expect(candidatesByID[used.id]?.snippetCount == 1)
+        #expect(candidatesByID[unused.id]?.snippetCount == 0)
+    }
+
+    @Test("キャッシュ済みの検索結果でも、ライブラリへのスニペット追加が反映される")
+    func searchResultsReflectLibraryChangesAfterCaching() {
+        let viewModel = makeViewModel(tags: [], snippets: [])
+        viewModel.queryText = "shared"
+        viewModel.resetSelectionForContentChange()
+        #expect(viewModel.searchMatches.isEmpty)
+
+        let newSnippet = Snippet(title: "shared snippet", body: "body")
+        viewModel.store.upsertSnippet(newSnippet)
+
+        #expect(viewModel.searchMatches.map(\.snippet.id) == [newSnippet.id])
+    }
+
+    @Test("キャッシュ済みの一覧でも、お気に入り切り替えが即座に反映される")
+    func favoriteSnippetsReflectToggleAfterCaching() {
+        let snippet = Snippet(title: "snippet", body: "body")
+        let viewModel = makeViewModel(tags: [], snippets: [snippet])
+        #expect(viewModel.favoriteSnippets().isEmpty)
+
+        viewModel.toggleFavorite(snippet.id)
+
+        #expect(viewModel.favoriteSnippets().map(\.id) == [snippet.id])
     }
 
     @Test("絞り込み中の最近使った順は現在のスニペット範囲だけで計算する")

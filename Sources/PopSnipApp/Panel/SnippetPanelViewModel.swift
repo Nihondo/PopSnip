@@ -43,6 +43,32 @@ enum PanelListItem: Identifiable {
     }
 }
 
+/// 検索語・タグ絞り込み・ライブラリの状態が変わっていなければ計算結果を使い回すための、
+/// 最新1件だけを覚えておく軽量キャッシュ。SwiftUI の body 再評価やキー操作のたびに
+/// 同じ検索/集計を繰り返さないために使う。
+private struct Memoized<Key: Equatable, Value> {
+    private var key: Key?
+    private var value: Value?
+
+    mutating func value(for key: Key, compute: () -> Value) -> Value {
+        if let currentKey = self.key, currentKey == key, let currentValue = value {
+            return currentValue
+        }
+        let computed = compute()
+        self.key = key
+        self.value = computed
+        return computed
+    }
+}
+
+/// 検索結果・タグ候補・項目列のキャッシュキー。
+/// これらはいずれも「検索語 + 選択中タグ + ライブラリの版」だけで一意に決まる。
+private struct PanelQueryCacheKey: Equatable {
+    let trimmedQuery: String
+    let selectedTagIDs: [UUID]
+    let revision: Int
+}
+
 /// 行の増減やタグ表示形式に影響されない、パネル内の安定した選択状態。
 enum PanelSelection: Equatable {
     case backToParent
@@ -61,6 +87,16 @@ final class SnippetPanelViewModel: ObservableObject {
     let preferences: PanelPreferences
     private let onSelectSnippet: (Snippet) -> Void
     private let onCancel: () -> Void
+
+    // MARK: - キャッシュ
+    // `queryText` / `selectedTagIDs` / `store.revision` が変わらない限り、検索・集計を
+    // 再実行せず前回の結果を返す。SwiftUI の body 再評価やキー操作のたびに同じ検索が
+    // 何度も走るのを防ぐための最新1件キャッシュ。
+    private var searchMatchesCache = Memoized<PanelQueryCacheKey, [SnippetSearchMatch]>()
+    private var visibleTagCandidatesCache = Memoized<PanelQueryCacheKey, [PanelTagCandidate]>()
+    private var listItemsCache = Memoized<PanelQueryCacheKey, [PanelListItem]>()
+    private var allSnippetsCache = Memoized<Int, [Snippet]>()
+    private var recentSnippetsCache = Memoized<Int, [Snippet]>()
 
     init(
         store: SnippetStore,
@@ -89,13 +125,15 @@ final class SnippetPanelViewModel: ObservableObject {
     }
 
     var searchMatches: [SnippetSearchMatch] {
-        SnippetSearchEngine.search(
-            query: queryText,
-            in: scopedSnippets,
-            tags: store.library.tags,
-            sortOrder: preferences.searchSortOrder,
-            limit: preferences.searchResultLimit
-        )
+        searchMatchesCache.value(for: queryCacheKey) {
+            SnippetSearchEngine.search(
+                query: queryText,
+                in: scopedSnippets,
+                index: store.searchIndex(),
+                sortOrder: preferences.searchSortOrder,
+                limit: preferences.searchResultLimit
+            )
+        }
     }
 
     /// タグセクションが有効なときだけ、現在のスコープと検索語に合う候補を返す。
@@ -103,12 +141,14 @@ final class SnippetPanelViewModel: ObservableObject {
         guard preferences.enabledSections.contains(.tags) else {
             return []
         }
-        let candidates = isDrilledDown ? scopedTagCandidates() : globalTagCandidates()
-        guard isSearching else {
-            return candidates
-        }
-        return candidates.filter {
-            $0.tag.name.range(of: trimmedQuery, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+        return visibleTagCandidatesCache.value(for: queryCacheKey) {
+            let candidates = isDrilledDown ? scopedTagCandidates() : globalTagCandidates()
+            guard isSearching else {
+                return candidates
+            }
+            return candidates.filter {
+                $0.tag.name.range(of: trimmedQuery, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            }
         }
     }
 
@@ -121,10 +161,12 @@ final class SnippetPanelViewModel: ObservableObject {
 
     /// 表示内容とキー操作が参照する唯一の論理項目列。
     var listItems: [PanelListItem] {
-        if isSearching || isDrilledDown {
-            return scopedListItems()
+        listItemsCache.value(for: queryCacheKey) {
+            if isSearching || isDrilledDown {
+                return scopedListItems()
+            }
+            return topLevelListItems()
         }
-        return topLevelListItems()
     }
 
     /// 検索中またはドリルダウン中に表示するスニペット項目。
@@ -277,12 +319,7 @@ final class SnippetPanelViewModel: ObservableObject {
         in snippets: [Snippet],
         excluding excludedTagIDs: [UUID]
     ) -> [PanelTagCandidate] {
-        var countsByTagID: [UUID: Int] = [:]
-        for snippet in snippets {
-            for tagID in snippet.tagIDs where excludedTagIDs.contains(tagID) == false {
-                countsByTagID[tagID, default: 0] += 1
-            }
-        }
+        let countsByTagID = tagSnippetCounts(in: snippets, excluding: excludedTagIDs)
         let tags = store.library.tags.filter { countsByTagID[$0.id] != nil }
         return orderedTags(tags, counts: countsByTagID, snippets: snippets).map {
             PanelTagCandidate(tag: $0, snippetCount: countsByTagID[$0.id] ?? 0)
@@ -293,18 +330,38 @@ final class SnippetPanelViewModel: ObservableObject {
         store.library.snippets.filter { $0.tagIDs.contains(tagID) }.count
     }
 
-    func recentSnippets() -> [Snippet] {
-        Array(
-            store.library.snippets
-                .filter { $0.lastUsedAt != nil }
-                .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
-                .prefix(preferences.recentsLimit)
-        )
+    /// タグ ID ごとのスニペット件数を、全スニペットを1回だけ走査して集計する。
+    /// `tags.count × snippets.count` の総当たりを避けるための共通処理。
+    private func tagSnippetCounts(
+        in snippets: [Snippet],
+        excluding excludedTagIDs: [UUID]
+    ) -> [UUID: Int] {
+        var countsByTagID: [UUID: Int] = [:]
+        for snippet in snippets {
+            for tagID in snippet.tagIDs where excludedTagIDs.contains(tagID) == false {
+                countsByTagID[tagID, default: 0] += 1
+            }
+        }
+        return countsByTagID
     }
 
+    func recentSnippets() -> [Snippet] {
+        recentSnippetsCache.value(for: store.revision) {
+            Array(
+                store.library.snippets
+                    .filter { $0.lastUsedAt != nil }
+                    .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
+                    .prefix(preferences.recentsLimit)
+            )
+        }
+    }
+
+    /// 表示名のロケール順にソートしたスニペット一覧。`favoriteSnippets()` もこの結果を再利用する。
     func allSnippets() -> [Snippet] {
-        store.library.snippets.sorted {
-            $0.displayTitle.localizedStandardCompare($1.displayTitle) == .orderedAscending
+        allSnippetsCache.value(for: store.revision) {
+            store.library.snippets.sorted {
+                $0.displayTitle.localizedStandardCompare($1.displayTitle) == .orderedAscending
+            }
         }
     }
 
@@ -320,6 +377,11 @@ final class SnippetPanelViewModel: ObservableObject {
 
     private var trimmedQuery: String {
         queryText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// 検索結果・タグ候補・項目列のキャッシュを識別するキー。
+    private var queryCacheKey: PanelQueryCacheKey {
+        PanelQueryCacheKey(trimmedQuery: trimmedQuery, selectedTagIDs: selectedTagIDs, revision: store.revision)
     }
 
     private func scopedListItems() -> [PanelListItem] {
@@ -351,9 +413,9 @@ final class SnippetPanelViewModel: ObservableObject {
     }
 
     private func globalTagCandidates() -> [PanelTagCandidate] {
-        let counts = Dictionary(
-            uniqueKeysWithValues: store.library.tags.map { ($0.id, snippetCount(for: $0.id)) }
-        )
+        // `subTagCandidates` と異なり、件数 0 のタグもトップレベルでは表示し続ける必要があるため、
+        // 全タグを対象に単一走査の件数辞書から引く（欠落キーは 0 件として扱う）。
+        let counts = tagSnippetCounts(in: store.library.snippets, excluding: [])
         return orderedTags(store.library.tags, counts: counts, snippets: store.library.snippets).map {
             PanelTagCandidate(tag: $0, snippetCount: counts[$0.id] ?? 0)
         }

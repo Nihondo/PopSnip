@@ -27,6 +27,7 @@
 		51CFCA694E9934B8DD37BF5B /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */; };
 		535763C8305BB1AD15609796 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2409091F46EDE1F841DE459F /* TagManagerView.swift */; };
 		57BFE64B3096F0CBFBE14EA8 /* HighlightRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A49D959D06B15CD1F3E50A /* HighlightRange.swift */; };
+		5ED9C80CCD3D8DAD37278B7A /* SnippetSearchIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FC1EABF880DDED5557BEDF /* SnippetSearchIndex.swift */; };
 		5F5DE97F9AA825D59B4F47A7 /* SnippetSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */; };
 		67C2454C962847C06ACF31B9 /* UpdateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91AA79DA8646AF3295E37C5 /* UpdateSettingsView.swift */; };
 		6995E7E990FBE3741F2DC773 /* AccessibilityInserter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F6A7552603C41A6B28042C /* AccessibilityInserter.swift */; };
@@ -112,6 +113,7 @@
 		7A13ABE94C5AF1865184BAC4 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		7E572148634A39D309933E61 /* ShortcutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsView.swift; sourceTree = "<group>"; };
 		7FFB800CECAB88E5D00D7F14 /* PopSnip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopSnip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		80FC1EABF880DDED5557BEDF /* SnippetSearchIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSearchIndex.swift; sourceTree = "<group>"; };
 		81316AB4425AED3F1E520690 /* PopSnipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopSnipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		936B37776C6D534C528D2FCA /* AppSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSharedState.swift; sourceTree = "<group>"; };
 		97897D34E3CDF6A7C68DA572 /* TagColorAssigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagColorAssigner.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 			children = (
 				C7A49D959D06B15CD1F3E50A /* HighlightRange.swift */,
 				EBC397CDE1622966ED1A4EEF /* SnippetSearchEngine.swift */,
+				80FC1EABF880DDED5557BEDF /* SnippetSearchIndex.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -519,6 +522,7 @@
 				50F0A3BE475F01D770934FE1 /* SnippetPanelViewModel.swift in Sources */,
 				1720783BCFAC93F8972B13ED /* SnippetRowView.swift in Sources */,
 				5F5DE97F9AA825D59B4F47A7 /* SnippetSearchEngine.swift in Sources */,
+				5ED9C80CCD3D8DAD37278B7A /* SnippetSearchIndex.swift in Sources */,
 				1CCB9BFC909E0AAE3D52ACA6 /* SnippetStore.swift in Sources */,
 				0EBADA37A1BB882A15F88890 /* SnippetTag.swift in Sources */,
 				D30687BE981D0587A1AB1B0F /* StatusBarController.swift in Sources */,
@@ -742,7 +746,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
@@ -762,7 +766,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Sources/Resources/Info.plist;
