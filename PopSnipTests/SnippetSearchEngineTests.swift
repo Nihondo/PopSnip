@@ -240,6 +240,60 @@ struct SnippetPanelTagNavigationTests {
         #expect(viewModel.searchMatches.map(\.snippet.id) == [snippet.id])
     }
 
+    @Test("最近使った順はタグを持つスニペットの最終使用日時を使い、未使用タグは登録順で末尾に置く")
+    func recentlyUsedTagOrderUsesLatestSnippetUsage() {
+        let firstUnused = SnippetTag(name: "first-unused", colorHex: "#7799DD")
+        let older = SnippetTag(name: "older", colorHex: "#16A34A")
+        let newer = SnippetTag(name: "newer", colorHex: "#F59E0B")
+        let lastUnused = SnippetTag(name: "last-unused", colorHex: "#EF4444")
+        let oldDate = Date(timeIntervalSince1970: 1_000)
+        let newDate = Date(timeIntervalSince1970: 2_000)
+        let snippets = [
+            Snippet(body: "old", tagIDs: [older.id], lastUsedAt: oldDate),
+            Snippet(body: "new", tagIDs: [newer.id], lastUsedAt: newDate)
+        ]
+        let preferences = PanelPreferences(tagSortOrder: .recentlyUsed)
+        let viewModel = makeViewModel(
+            tags: [firstUnused, older, newer, lastUnused],
+            snippets: snippets,
+            preferences: preferences
+        )
+
+        #expect(viewModel.visibleTagCandidates.map(\.id) == [newer.id, older.id, firstUnused.id, lastUnused.id])
+    }
+
+    @Test("絞り込み中の最近使った順は現在のスニペット範囲だけで計算する")
+    func recentlyUsedTagOrderUsesCurrentDrillDownScope() {
+        let prompt = SnippetTag(name: "prompt", colorHex: "#16A34A")
+        let youtube = SnippetTag(name: "youtube", colorHex: "#7799DD")
+        let suno = SnippetTag(name: "suno", colorHex: "#EF4444")
+        let scopedOld = Snippet(
+            body: "scoped-old",
+            tagIDs: [prompt.id, youtube.id],
+            lastUsedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let scopedNew = Snippet(
+            body: "scoped-new",
+            tagIDs: [prompt.id, suno.id],
+            lastUsedAt: Date(timeIntervalSince1970: 2_000)
+        )
+        let globallyNewestYoutube = Snippet(
+            body: "outside",
+            tagIDs: [youtube.id],
+            lastUsedAt: Date(timeIntervalSince1970: 3_000)
+        )
+        let preferences = PanelPreferences(tagSortOrder: .recentlyUsed)
+        let viewModel = makeViewModel(
+            tags: [prompt, youtube, suno],
+            snippets: [scopedOld, scopedNew, globallyNewestYoutube],
+            preferences: preferences
+        )
+
+        viewModel.drillIntoTag(prompt.id)
+
+        #expect(viewModel.visibleTagCandidates.map(\.id) == [suno.id, youtube.id])
+    }
+
     private func makeViewModel(
         tags: [SnippetTag],
         snippets: [Snippet],
@@ -277,5 +331,22 @@ struct TagLayoutSettingsTests {
 
         defaults.set("invalid", forKey: UserDefaultsKeys.panelTagLayoutStyle)
         #expect(AppSettingsResolver.resolvePanelPreferences(userDefaults: defaults).tagLayoutStyle == .horizontalStrip)
+    }
+
+    @Test("タグの最近使った順を保存復元でき、不正値は登録順へ戻る")
+    func recentlyUsedTagOrderRoundTripsAndFallsBack() throws {
+        let suiteName = "PopSnipTagSortOrderTests-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        #expect(AppSettingsResolver.resolvePanelPreferences(userDefaults: defaults).tagSortOrder == .registrationOrder)
+
+        var preferences = PanelPreferences.default
+        preferences.tagSortOrder = .recentlyUsed
+        AppSettingsResolver.savePanelPreferences(preferences, userDefaults: defaults)
+        #expect(AppSettingsResolver.resolvePanelPreferences(userDefaults: defaults).tagSortOrder == .recentlyUsed)
+
+        defaults.set("invalid", forKey: UserDefaultsKeys.panelTagSortOrder)
+        #expect(AppSettingsResolver.resolvePanelPreferences(userDefaults: defaults).tagSortOrder == .registrationOrder)
     }
 }

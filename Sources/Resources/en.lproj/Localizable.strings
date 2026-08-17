@@ -93,6 +93,7 @@
 "settings.panel.tagSortOrder" = "Tag Order";
 "settings.panel.tagSortOrder.registrationOrder" = "Registration Order";
 "settings.panel.tagSortOrder.snippetCountDescending" = "Most Matches First";
+"settings.panel.tagSortOrder.recentlyUsed" = "Recently Used";
 "settings.panel.tagLayoutStyle" = "Tag Layout";
 "settings.panel.tagLayoutStyle.horizontalStrip" = "Single Row (Horizontal Scroll)";
 "settings.panel.tagLayoutStyle.verticalList" = "One Tag per Row";

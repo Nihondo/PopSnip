@@ -32,6 +32,8 @@ public enum TagSortOrder: String, Codable, CaseIterable, Sendable {
     case registrationOrder
     /// 一致件数の多い順。
     case snippetCountDescending
+    /// タグを持つスニペットが最後に使用された日時の新しい順。
+    case recentlyUsed
 }
 
 /// 検索パネル内のタグ候補の表示形式。

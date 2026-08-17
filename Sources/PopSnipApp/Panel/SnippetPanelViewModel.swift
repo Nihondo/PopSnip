@@ -284,7 +284,7 @@ final class SnippetPanelViewModel: ObservableObject {
             }
         }
         let tags = store.library.tags.filter { countsByTagID[$0.id] != nil }
-        return orderedTags(tags, counts: countsByTagID).map {
+        return orderedTags(tags, counts: countsByTagID, snippets: snippets).map {
             PanelTagCandidate(tag: $0, snippetCount: countsByTagID[$0.id] ?? 0)
         }
     }
@@ -354,7 +354,7 @@ final class SnippetPanelViewModel: ObservableObject {
         let counts = Dictionary(
             uniqueKeysWithValues: store.library.tags.map { ($0.id, snippetCount(for: $0.id)) }
         )
-        return orderedTags(store.library.tags, counts: counts).map {
+        return orderedTags(store.library.tags, counts: counts, snippets: store.library.snippets).map {
             PanelTagCandidate(tag: $0, snippetCount: counts[$0.id] ?? 0)
         }
     }
@@ -440,19 +440,77 @@ final class SnippetPanelViewModel: ObservableObject {
         }
     }
 
-    /// タグ設定に従って並べる。件数が同じ場合は登録順を明示的に維持する。
-    private func orderedTags(_ tags: [SnippetTag], counts: [UUID: Int]) -> [SnippetTag] {
-        guard preferences.tagSortOrder == .snippetCountDescending else {
+    /// タグ設定に従って並べ、比較値が同じタグは登録順を維持する。
+    private func orderedTags(
+        _ tags: [SnippetTag],
+        counts: [UUID: Int],
+        snippets: [Snippet]
+    ) -> [SnippetTag] {
+        let indices = registrationIndicesByTagID()
+        switch preferences.tagSortOrder {
+        case .registrationOrder:
             return tags
+        case .snippetCountDescending:
+            return tags.sorted {
+                precedesBySnippetCount($0, $1, counts: counts, indices: indices)
+            }
+        case .recentlyUsed:
+            let dates = lastUsedDatesByTagID(in: snippets)
+            return tags.sorted {
+                precedesByRecentUse($0, $1, dates: dates, indices: indices)
+            }
         }
-        let indices = Dictionary(uniqueKeysWithValues: store.library.tags.enumerated().map { ($0.element.id, $0.offset) })
-        return tags.sorted {
-            let leftCount = counts[$0.id] ?? 0
-            let rightCount = counts[$1.id] ?? 0
-            return leftCount == rightCount
-                ? (indices[$0.id] ?? 0) < (indices[$1.id] ?? 0)
-                : leftCount > rightCount
+    }
+
+    private func precedesBySnippetCount(
+        _ leftTag: SnippetTag,
+        _ rightTag: SnippetTag,
+        counts: [UUID: Int],
+        indices: [UUID: Int]
+    ) -> Bool {
+        let leftCount = counts[leftTag.id] ?? 0
+        let rightCount = counts[rightTag.id] ?? 0
+        return leftCount == rightCount
+            ? precedesByRegistration(leftTag, rightTag, indices: indices)
+            : leftCount > rightCount
+    }
+
+    private func precedesByRecentUse(
+        _ leftTag: SnippetTag,
+        _ rightTag: SnippetTag,
+        dates: [UUID: Date],
+        indices: [UUID: Int]
+    ) -> Bool {
+        let leftDate = dates[leftTag.id] ?? .distantPast
+        let rightDate = dates[rightTag.id] ?? .distantPast
+        return leftDate == rightDate
+            ? precedesByRegistration(leftTag, rightTag, indices: indices)
+            : leftDate > rightDate
+    }
+
+    private func registrationIndicesByTagID() -> [UUID: Int] {
+        Dictionary(uniqueKeysWithValues: store.library.tags.enumerated().map { ($0.element.id, $0.offset) })
+    }
+
+    private func lastUsedDatesByTagID(in snippets: [Snippet]) -> [UUID: Date] {
+        var datesByTagID: [UUID: Date] = [:]
+        for snippet in snippets {
+            guard let lastUsedAt = snippet.lastUsedAt else {
+                continue
+            }
+            for tagID in snippet.tagIDs where lastUsedAt > (datesByTagID[tagID] ?? .distantPast) {
+                datesByTagID[tagID] = lastUsedAt
+            }
         }
+        return datesByTagID
+    }
+
+    private func precedesByRegistration(
+        _ leftTag: SnippetTag,
+        _ rightTag: SnippetTag,
+        indices: [UUID: Int]
+    ) -> Bool {
+        (indices[leftTag.id] ?? 0) < (indices[rightTag.id] ?? 0)
     }
 
     private func emptyMatch(for snippet: Snippet) -> SnippetSearchMatch {

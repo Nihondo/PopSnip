@@ -49,6 +49,7 @@ struct PanelLayoutSettingsView: View {
                 Picker(L10n.string("settings.panel.tagSortOrder"), selection: $preferences.tagSortOrder) {
                     Text(L10n.string("settings.panel.tagSortOrder.registrationOrder")).tag(TagSortOrder.registrationOrder)
                     Text(L10n.string("settings.panel.tagSortOrder.snippetCountDescending")).tag(TagSortOrder.snippetCountDescending)
+                    Text(L10n.string("settings.panel.tagSortOrder.recentlyUsed")).tag(TagSortOrder.recentlyUsed)
                 }
                 .onChange(of: preferences.tagSortOrder) { savePreferences() }
 

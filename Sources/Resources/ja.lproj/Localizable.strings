@@ -93,6 +93,7 @@
 "settings.panel.tagSortOrder" = "タグの並び順";
 "settings.panel.tagSortOrder.registrationOrder" = "登録順";
 "settings.panel.tagSortOrder.snippetCountDescending" = "一致件数の多い順";
+"settings.panel.tagSortOrder.recentlyUsed" = "最近使った順";
 "settings.panel.tagLayoutStyle" = "タグの表示形式";
 "settings.panel.tagLayoutStyle.horizontalStrip" = "1行（横スクロール）";
 "settings.panel.tagLayoutStyle.verticalList" = "1タグ1行";

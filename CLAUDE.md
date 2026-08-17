@@ -69,6 +69,8 @@ Arrow keys, Tab/Shift+Tab, Enter, Backspace, Esc, and `⌘1`–`⌘9` inside the
 
 `SnippetPanelViewModel` stores panel focus as a stable `PanelSelection` (back row, tag ID, or snippet ID plus section context), rather than a raw row index. `listItems` is the shared logical ordering for rendering and keyboard actions. In the default `.horizontalStrip` layout, all visible tags occupy one vertical navigation row while Tab/Shift+Tab and left/right cycle individual tags; `.verticalList` keeps one tag per vertical row. Search filters tag suggestions and snippets within the current selected-tag scope, but `⌘1`–`⌘9` always counts snippet results only.
 
+Tag ordering is controlled by `PanelPreferences.tagSortOrder`. The `.recentlyUsed` option is derived from the greatest `Snippet.lastUsedAt` among snippets carrying each tag, so it does not add state to `SnippetTag` or require a JSON migration. At the top level it uses the whole library; during tag drill-down it uses only the currently scoped snippets. Tags with equal dates, including never-used tags, retain registration order.
+
 ### Sibling project: timeSlice
 
 `/Users/nihondo/Library/CloudStorage/Dropbox/Projects.localized/timeSlice` is a sibling macOS menu bar app by the same author. Several PopSnip subsystems are intentionally ported from it (with credit in file-header comments) to keep the two apps' UX consistent: the settings window's sidebar `NavigationSplitView` layout, the About panel (`NSApp.orderFrontStandardAboutPanel`), and `AppUpdateController` (Sparkle wrapper). When extending these areas, check timeSlice's equivalent file first rather than inventing a new pattern.

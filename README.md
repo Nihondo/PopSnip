@@ -1,6 +1,6 @@
 # PopSnip
 
-PopSnip is a lightweight macOS menu bar app for storing text snippets and inserting them into any app with a global keyboard shortcut — a fast, Raycast-style search panel for your everyday boilerplate text.
+PopSnip is a lightweight macOS menu bar app for storing text snippets and inserting them into any app with a global keyboard shortcut — a fast, Spotlight-style search panel for your everyday boilerplate text.
 
 ## Features
 
@@ -62,6 +62,7 @@ Build and run the `PopSnip` scheme in Xcode (`⌘R`).
 - A snippet can have multiple tags, shown as colored rounded chips.
 - New tags get an automatically assigned color; click the color circle in the tag manager to pick a different one from the palette.
 - Tags appear in a single horizontally scrollable row by default. The selected tag scrolls into view automatically; choose the one-tag-per-row layout in **Settings → Panel** if preferred.
+- Tag order can be set to registration order, most matches first, or recently used in **Settings → Panel**. Recently used is based on the latest use of a snippet carrying each tag; during a drill-down, it is calculated only from snippets in the current tag scope.
 - Click or press Enter on a tag to drill into snippets that have it. Search within a drill-down is limited to the currently selected tag scope, and additional matching tags can be selected to narrow it further.
 - Add or create tags while editing a snippet, or manage all tags — rename, recolor, delete, or add new ones — from the sidebar of the snippet list window.
 
@@ -79,7 +80,7 @@ Open it from the panel's **List** button or the menu bar.
 Open from the panel's **Settings** button or **PopSnip Settings...** in the menu bar. A sidebar switches between:
 
 - **General** — launch at login, insertion method (Automatic / Accessibility only / Clipboard only), clipboard restore delay, font size, and the snippet storage location.
-- **Panel** — which sections appear and in what order, item counts, sort order, tag layout, panel position, Enter key behavior, number-key selection, and tag color display.
+- **Panel** — which sections appear and in what order, item counts, search and tag sort order, tag layout, panel position, Enter key behavior, number-key selection, and tag color display.
 - **Shortcut** — customize the global shortcut for each action.
 - **Permission** — check and grant Accessibility access.
 - **Update** — check for updates now, toggle automatic checks, and see the current version.

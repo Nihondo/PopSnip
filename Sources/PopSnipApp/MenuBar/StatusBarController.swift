@@ -31,7 +31,7 @@ final class StatusBarController: NSObject {
             return
         }
         button.image = NSImage(
-            systemSymbolName: "text.badge.plus",
+            systemSymbolName: "rectangle.and.text.magnifyingglass",
             accessibilityDescription: "PopSnip"
         )
     }
@@ -45,7 +45,9 @@ final class StatusBarController: NSObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshMenu()
+            Task { @MainActor [weak self] in
+                self?.refreshMenu()
+            }
         }
     }
 
