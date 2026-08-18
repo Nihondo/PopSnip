@@ -31,6 +31,8 @@ targets:
     type: application
     platform: macOS
     sources:
+      - path: AppIcon.icon
+        buildPhase: resources
       - path: Sources/PopSnipApp
       - path: Sources/PopSnipCore
       - path: Sources/Resources
@@ -47,6 +49,11 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+        # Xcode が xcodebuild 実行時にビルド時自動補完で書き足す2値。project.yml に明示しておかないと
+        # xcodegen generate のたびに消え、次の xcodebuild でまた書き足される往復が起きるため固定する。
+        # LSApplicationCategoryType は Sources/Resources/Info.plist 側の値と必ず一致させること。
+        INFOPLIST_KEY_CFBundleDisplayName: PopSnip
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
     scheme:
       testTargets:
         - PopSnipTests
