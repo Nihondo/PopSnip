@@ -64,44 +64,55 @@ private struct SnippetEditorContentView: View {
                 .help(L10n.string("editor.field.favorite"))
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.string("editor.field.title"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField(L10n.string("editor.field.title.placeholder"), text: $title)
-                    .textFieldStyle(.roundedBorder)
-            }
+            // プレースホルダのディスクロージャを開くとコンテンツ高さが伸びるが、
+            // ウィンドウは固定サイズでリサイズ不可のため、保存/キャンセルボタンが
+            // ウィンドウ外へ押し出されて操作不能になっていた。可変長になり得る本文・
+            // プレースホルダ・タグ部分だけを ScrollView に閉じ込め、ヘッダーと
+            // フッターのボタン列を常に固定表示させることで解消する。
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.medium) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L10n.string("editor.field.title"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        TextField(L10n.string("editor.field.title.placeholder"), text: $title)
+                            .textFieldStyle(.roundedBorder)
+                    }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.string("editor.field.body"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                SnippetBodyTextView(text: $bodyDraft, onTextViewCreated: { bodyTextView = $0 })
-                    .frame(minHeight: 160)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                            .stroke(Color.secondary.opacity(0.3))
-                    )
-                PlaceholderPaletteView(onInsert: insertPlaceholder)
-            }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L10n.string("editor.field.body"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        SnippetBodyTextView(text: $bodyDraft, onTextViewCreated: { bodyTextView = $0 })
+                            .frame(minHeight: 160)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                                    .stroke(Color.secondary.opacity(0.3))
+                            )
+                        PlaceholderPaletteView(onInsert: insertPlaceholder)
+                    }
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.string("editor.field.tags"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(L10n.string("editor.field.tags"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
-                tagPicker
+                        tagPicker
 
-                HStack {
-                    TextField(L10n.string("editor.field.newTag.placeholder"), text: $newTagName)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit(createTagFromInput)
-                    Button(L10n.string("editor.button.addTag"), action: createTagFromInput)
-                        .disabled(newTagName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        HStack {
+                            TextField(L10n.string("editor.field.newTag.placeholder"), text: $newTagName)
+                                .textFieldStyle(.roundedBorder)
+                                .onSubmit(createTagFromInput)
+                            Button(L10n.string("editor.button.addTag"), action: createTagFromInput)
+                                .disabled(newTagName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                    }
                 }
+                // ScrollView はデフォルトで内容をその境界にクリップするため、内側の
+                // VStack をわずかに狭めてテキストフィールドのフォーカスリングの
+                // 描画余白を確保する（余白がないと左右のリングが境界で切れて見える）。
+                .padding(.horizontal, 3)
             }
-
-            Spacer(minLength: 0)
 
             HStack {
                 if editingSnippetID != nil {
@@ -123,7 +134,7 @@ private struct SnippetEditorContentView: View {
             }
         }
         .padding(DesignTokens.Spacing.large)
-        .frame(minWidth: 480, minHeight: 500)
+        .frame(width: DesignTokens.WindowSize.editorWidth, height: DesignTokens.WindowSize.editorHeight)
         .onAppear(perform: loadInitialState)
         .alert(
             L10n.string("editor.deleteConfirm.title"),

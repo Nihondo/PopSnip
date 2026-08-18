@@ -28,6 +28,8 @@ enum DesignTokens {
         static let listSidebarMinWidth: CGFloat = 260
         static let listSidebarIdealWidth: CGFloat = 300
         static let listSidebarMaxWidth: CGFloat = 420
+        static let editorWidth: CGFloat = 480
+        static let editorHeight: CGFloat = 500
     }
 
     /// パネル・スニペット一覧で使うベースの文字サイズ。
