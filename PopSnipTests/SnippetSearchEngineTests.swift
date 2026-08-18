@@ -259,7 +259,7 @@ struct SnippetPanelTagNavigationTests {
         let viewModel = makeViewModel(
             tags: [youtube],
             snippets: [snippet],
-            onSelectSnippet: { selectedSnippetID = $0.id }
+            onSelectSnippet: { snippet, _ in selectedSnippetID = snippet.id }
         )
         viewModel.queryText = "you"
         viewModel.resetSelectionForContentChange()
@@ -376,7 +376,7 @@ struct SnippetPanelTagNavigationTests {
         tags: [SnippetTag],
         snippets: [Snippet],
         preferences: PanelPreferences = .default,
-        onSelectSnippet: @escaping (Snippet) -> Void = { _ in }
+        onSelectSnippet: @escaping (Snippet, Bool) -> Void = { _, _ in }
     ) -> SnippetPanelViewModel {
         let fileURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("PopSnipPanelTests-\(UUID().uuidString).json")

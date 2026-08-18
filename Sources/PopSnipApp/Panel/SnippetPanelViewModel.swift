@@ -82,10 +82,13 @@ final class SnippetPanelViewModel: ObservableObject {
     /// ドリルダウンのパンくず。選択順に末尾へ追加する。
     @Published var selectedTagIDs: [UUID] = []
     @Published private(set) var selection: PanelSelection?
+    /// 確定の視覚フィードバックのためだけに選択を動かしているあいだ true。
+    /// この間はスクロール追従を抑え、以降の確定操作も受け付けない。
+    @Published private(set) var isConfirmingSelection = false
 
     let store: SnippetStore
     let preferences: PanelPreferences
-    private let onSelectSnippet: (Snippet) -> Void
+    private let onSelectSnippet: (Snippet, Bool) -> Void
     private let onCancel: () -> Void
 
     // MARK: - キャッシュ
@@ -101,7 +104,7 @@ final class SnippetPanelViewModel: ObservableObject {
     init(
         store: SnippetStore,
         preferences: PanelPreferences,
-        onSelectSnippet: @escaping (Snippet) -> Void,
+        onSelectSnippet: @escaping (Snippet, Bool) -> Void,
         onCancel: @escaping () -> Void
     ) {
         self.store = store
@@ -294,8 +297,21 @@ final class SnippetPanelViewModel: ObservableObject {
         selection == .snippet(snippetID, context: context)
     }
 
-    func selectSnippet(_ snippet: Snippet) {
-        onSelectSnippet(snippet)
+    /// マウスクリックなど、キーボード選択を経ずにスニペットを確定する経路から呼ぶ。
+    /// 確定した行をハイライトへ反映してから挿入を依頼する。
+    func selectSnippet(_ snippet: Snippet, context: String) {
+        confirmSnippetShowingHighlight(snippet, context: context)
+    }
+
+    /// キーボード選択を経ずに確定する経路（クリック・⌘数字）で、確定した行を
+    /// ハイライトへ反映してから挿入を依頼する。
+    private func confirmSnippetShowingHighlight(_ snippet: Snippet, context: String) {
+        guard isConfirmingSelection == false else {
+            return
+        }
+        isConfirmingSelection = true
+        selection = .snippet(snippet.id, context: context)
+        onSelectSnippet(snippet, true)
     }
 
     // MARK: - データ解決
@@ -463,16 +479,17 @@ final class SnippetPanelViewModel: ObservableObject {
     }
 
     private func selectSnippetByOrdinal(_ index: Int) -> Bool {
-        let snippets = listItems.compactMap { item -> Snippet? in
-            guard case .snippet(let match, _) = item else {
+        let snippets = listItems.compactMap { item -> (Snippet, String)? in
+            guard case .snippet(let match, let context) = item else {
                 return nil
             }
-            return match.snippet
+            return (match.snippet, context)
         }
         guard snippets.indices.contains(index) else {
             return false
         }
-        onSelectSnippet(snippets[index])
+        let (snippet, context) = snippets[index]
+        confirmSnippetShowingHighlight(snippet, context: context)
         return true
     }
 
@@ -498,7 +515,7 @@ final class SnippetPanelViewModel: ObservableObject {
         case .tag(let candidate):
             drillIntoTag(candidate.tag.id)
         case .snippet(let match, _):
-            onSelectSnippet(match.snippet)
+            onSelectSnippet(match.snippet, false)
         }
     }
 

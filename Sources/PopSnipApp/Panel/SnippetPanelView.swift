@@ -79,7 +79,9 @@ struct SnippetPanelView: View {
             }
             .frame(maxHeight: .infinity)
             .onChange(of: viewModel.highlightedItemID) { _, highlightedItemID in
-                guard let highlightedItemID else {
+                // 確定演出のための選択移動では追従しない。クリックした行は既に可視であり、
+                // ここで中央寄せするとパネルが閉じる直前に画面が跳ねる。
+                guard viewModel.isConfirmingSelection == false, let highlightedItemID else {
                     return
                 }
                 withAnimation(.easeOut(duration: 0.12)) {
@@ -190,7 +192,7 @@ struct SnippetPanelView: View {
                 indexHint: viewModel.preferences.isNumberKeySelectionEnabled ? searchOrdinal : nil,
                 onToggleFavorite: { viewModel.toggleFavorite(match.snippet.id) }
             )
-            .onTapGesture { viewModel.selectSnippet(match.snippet) }
+            .onTapGesture { viewModel.selectSnippet(match.snippet, context: context) }
             .snippetContextMenu(match.snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
         }
     }
@@ -206,7 +208,7 @@ struct SnippetPanelView: View {
             indexHint: nil,
             onToggleFavorite: { viewModel.toggleFavorite(snippet.id) }
         )
-        .onTapGesture { viewModel.selectSnippet(snippet) }
+        .onTapGesture { viewModel.selectSnippet(snippet, context: context) }
         .snippetContextMenu(snippet, onEdit: onOpenEditor, onDelete: onDeleteSnippet)
     }
 

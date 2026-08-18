@@ -14,6 +14,8 @@ import SwiftUI
 @MainActor
 final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
     private let closeAnimationDuration: TimeInterval = 0.12
+    /// 確定した行のハイライトを見せてからパネルを閉じるまでの保持時間。
+    private let confirmHighlightDuration: TimeInterval = 0.09
     private let store: SnippetStore
 
     private var activePanel: SnippetPanel?
@@ -88,8 +90,8 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
         let viewModel = SnippetPanelViewModel(
             store: store,
             preferences: preferences,
-            onSelectSnippet: { [weak self] snippet in
-                self?.insertAndClose(snippet)
+            onSelectSnippet: { [weak self] snippet, waitsForConfirmHighlight in
+                self?.insertAndClose(snippet, waitsForConfirmHighlight: waitsForConfirmHighlight)
             },
             onCancel: { [weak self] in
                 self?.closePanelIfNeeded(animated: true)
@@ -182,13 +184,31 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
 
     // MARK: - 挿入
 
-    private func insertAndClose(_ snippet: Snippet) {
+    private func insertAndClose(_ snippet: Snippet, waitsForConfirmHighlight: Bool) {
+        guard isHandlingPanelAction == false else {
+            return
+        }
         guard let target = currentTarget else {
             closePanelIfNeeded(animated: false)
             return
         }
-        let preferences = AppSettingsResolver.resolvePanelPreferences()
         isHandlingPanelAction = true
+        guard waitsForConfirmHighlight else {
+            performInsertion(of: snippet, into: target)
+            return
+        }
+        // 確定した行のハイライトが実際に描画されてから閉じる。保持中の誤操作を防ぐため
+        // キーモニタを先に外しておく（closePanelIfNeeded 内でも呼ばれるため二重呼び出しは無害）。
+        removeKeyDownMonitorIfNeeded()
+        DispatchQueue.main.asyncAfter(deadline: .now() + confirmHighlightDuration) { [weak self] in
+            MainActor.assumeIsolated {
+                self?.performInsertion(of: snippet, into: target)
+            }
+        }
+    }
+
+    private func performInsertion(of snippet: Snippet, into target: InsertionTarget) {
+        let preferences = AppSettingsResolver.resolvePanelPreferences()
         closePanelIfNeeded(animated: false) { [weak self] in
             guard let self else {
                 return
