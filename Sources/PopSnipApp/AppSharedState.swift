@@ -116,13 +116,19 @@ final class AppSharedState: NSObject {
     }
 
     /// 選択範囲から即座にスニペット登録画面を開く（検索パネルは経由しない）。
+    /// AXManualAccessibility による再取得（`.brief`）でも空だった場合、ユーザーの明示操作である
+    /// ことを踏まえ Cmd+C フォールバックを最後に試みる（VS Code 等 AX ツリーを持たないアプリ向け）。
     private func handleQuickRegisterShortcut() {
         guard AccessibilityPermission.isGranted() else {
             AccessibilityPermission.requestIfNeeded()
             return
         }
-        let target = FocusSnapshotResolver.resolveCurrentTarget()
-        editorWindowController.showEditor(editingSnippetID: nil, initialBody: target?.selectedText ?? "")
+        let target = FocusSnapshotResolver.resolveCurrentTarget(recovery: .brief())
+        var initialBody = target?.selectedText ?? ""
+        if initialBody.isEmpty, let target, target.security != .secureTextField {
+            initialBody = SelectionClipboardReader.readSelectedText()
+        }
+        editorWindowController.showEditor(editingSnippetID: nil, initialBody: initialBody)
     }
 
     private func logAccessibilityPermissionStateIfNeeded() {

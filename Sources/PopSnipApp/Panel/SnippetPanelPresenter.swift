@@ -62,7 +62,7 @@ final class SnippetPanelPresenter: NSObject, NSWindowDelegate {
             AccessibilityPermission.requestIfNeeded()
             return
         }
-        guard let target = FocusSnapshotResolver.resolveCurrentTarget() else {
+        guard let target = FocusSnapshotResolver.resolveCurrentTarget(recovery: .immediate) else {
             Logger.panel.notice("前面アプリのフォーカス要素を取得できなかったためパネルを表示しません")
             return
         }

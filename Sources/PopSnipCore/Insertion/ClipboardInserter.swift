@@ -6,14 +6,6 @@
 import AppKit
 import Foundation
 
-/// クリップボードの内容を型ごと複製したスナップショット。
-private struct PasteboardSnapshot {
-    /// 各アイテムが持つ (型, データ) の一覧。
-    let items: [[(type: NSPasteboard.PasteboardType, data: Data)]]
-    /// 退避直前の changeCount。復元直前にこの値からの変化を確認するために使う。
-    let changeCountBeforeCapture: Int
-}
-
 /// クリップボード経由の貼り付け（Cmd+V）による挿入を担当する。
 public enum ClipboardInserter {
     /// 貼り付け完了待機のデフォルト時間（ミリ秒）。Electron 系アプリ（Slack / VS Code）は反映が遅いため
@@ -37,17 +29,17 @@ public enum ClipboardInserter {
         caretCharacterOffsetFromEnd: Int? = nil
     ) {
         let pasteboard = NSPasteboard.general
-        let snapshot = captureSnapshot(from: pasteboard)
+        let snapshot = PasteboardSnapshot.capture(from: pasteboard)
 
         defer {
-            restore(snapshot, to: pasteboard)
+            snapshot.restore(to: pasteboard)
         }
 
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
 
         let ownChangeCountAfterWrite = pasteboard.changeCount
-        postCommandV()
+        KeyEventSender.postCommandKeyCombo(virtualKey: 0x09) // kVK_ANSI_V
 
         // 貼り付け完了を待つ。changeCount の変化（ペースト先アプリがクリップボードを読み取った
         // ことの直接的なシグナルにはならないが、少なくとも自分の書き込みが安定して存在する時間を
@@ -61,59 +53,14 @@ public enum ClipboardInserter {
         moveCaretLeftIfNeeded(by: caretCharacterOffsetFromEnd)
     }
 
-    // MARK: - 退避
-
-    private static func captureSnapshot(from pasteboard: NSPasteboard) -> PasteboardSnapshot {
-        let items = (pasteboard.pasteboardItems ?? []).map { item -> [(NSPasteboard.PasteboardType, Data)] in
-            item.types.compactMap { type -> (NSPasteboard.PasteboardType, Data)? in
-                guard let data = item.data(forType: type) else {
-                    return nil
-                }
-                return (type, data)
-            }
-        }
-        return PasteboardSnapshot(items: items, changeCountBeforeCapture: pasteboard.changeCount)
-    }
-
     // MARK: - 貼り付け
 
-    private static func postCommandV() {
-        guard let eventSource = CGEventSource(stateID: .combinedSessionState) else {
-            return
-        }
-        let commandKeyCode: CGKeyCode = 0x37 // kVK_Command
-        let vKeyCode: CGKeyCode = 0x09 // kVK_ANSI_V
-
-        let commandDown = CGEvent(keyboardEventSource: eventSource, virtualKey: commandKeyCode, keyDown: true)
-        let vDown = CGEvent(keyboardEventSource: eventSource, virtualKey: vKeyCode, keyDown: true)
-        vDown?.flags = .maskCommand
-        let vUp = CGEvent(keyboardEventSource: eventSource, virtualKey: vKeyCode, keyDown: false)
-        vUp?.flags = .maskCommand
-        let commandUp = CGEvent(keyboardEventSource: eventSource, virtualKey: commandKeyCode, keyDown: false)
-
-        commandDown?.post(tap: .cghidEventTap)
-        vDown?.post(tap: .cghidEventTap)
-        vUp?.post(tap: .cghidEventTap)
-        commandUp?.post(tap: .cghidEventTap)
-    }
-
     /// 貼り付け直後に左矢印キーを `characterCount` 回送出してキャレットを戻す。
-    /// `postCommandV()` と同じ `CGEventSource`/`.cghidEventTap` の作法を踏襲する。
     private static func moveCaretLeftIfNeeded(by characterCount: Int?) {
         guard let characterCount, characterCount > 0, characterCount <= maxCaretMoveCount else {
             return
         }
-        guard let eventSource = CGEventSource(stateID: .combinedSessionState) else {
-            return
-        }
-        let leftArrowKeyCode: CGKeyCode = 0x7B // kVK_LeftArrow
-
-        for _ in 0..<characterCount {
-            let keyDown = CGEvent(keyboardEventSource: eventSource, virtualKey: leftArrowKeyCode, keyDown: true)
-            let keyUp = CGEvent(keyboardEventSource: eventSource, virtualKey: leftArrowKeyCode, keyDown: false)
-            keyDown?.post(tap: .cghidEventTap)
-            keyUp?.post(tap: .cghidEventTap)
-        }
+        KeyEventSender.postLeftArrow(count: characterCount)
     }
 
     private static func waitForPasteToSettle(
@@ -132,31 +79,5 @@ public enum ClipboardInserter {
                 break
             }
         }
-    }
-
-    // MARK: - 復元
-
-    private static func restore(_ snapshot: PasteboardSnapshot, to pasteboard: NSPasteboard) {
-        // 復元直前に、まだ自分が書き込んだ内容のままかを確認する。
-        // その間にユーザーが別の内容を手動コピーしていた場合は、それを上書きしない。
-        guard pasteboard.changeCount != snapshot.changeCountBeforeCapture else {
-            // 自分の書き込みが一度も発生していない（=何もしていない）ケース。復元不要。
-            return
-        }
-
-        pasteboard.clearContents()
-        guard snapshot.items.isEmpty == false else {
-            // 退避時点でクリップボードが空だった場合は、空のまま維持する。
-            return
-        }
-
-        let restoredItems: [NSPasteboardItem] = snapshot.items.map { typedDataList in
-            let item = NSPasteboardItem()
-            for (type, data) in typedDataList {
-                item.setData(data, forType: type)
-            }
-            return item
-        }
-        pasteboard.writeObjects(restoredItems)
     }
 }
