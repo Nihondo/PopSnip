@@ -107,8 +107,8 @@ struct SnippetPanelView: View {
             tagCandidateContent(viewModel.visibleTagCandidates)
         }
 
-        ForEach(Array(viewModel.scopedSnippetItems.enumerated()), id: \.element.id) { ordinal, item in
-            snippetRow(for: item, searchOrdinal: viewModel.isSearching ? ordinal + 1 : nil)
+        ForEach(viewModel.scopedSnippetItems) { item in
+            snippetRow(for: item)
                 .id(item.id)
         }
     }
@@ -180,7 +180,7 @@ struct SnippetPanelView: View {
     }
 
     @ViewBuilder
-    private func snippetRow(for item: PanelListItem, searchOrdinal: Int?) -> some View {
+    private func snippetRow(for item: PanelListItem) -> some View {
         if case .snippet(let match, let context) = item {
             SnippetRowView(
                 snippet: match.snippet,
@@ -189,7 +189,7 @@ struct SnippetPanelView: View {
                 bodyHighlights: match.bodyHighlights,
                 isTagColorShown: viewModel.preferences.isTagColorShown,
                 isSelected: viewModel.isSnippetSelected(match.snippet.id, context: context),
-                indexHint: viewModel.preferences.isNumberKeySelectionEnabled ? searchOrdinal : nil,
+                indexHint: viewModel.snippetOrdinalsByItemID[item.id],
                 onToggleFavorite: { viewModel.toggleFavorite(match.snippet.id) }
             )
             .onTapGesture { viewModel.selectSnippet(match.snippet, context: context) }
@@ -198,14 +198,15 @@ struct SnippetPanelView: View {
     }
 
     private func snippetRow(for snippet: Snippet, context: String) -> some View {
-        SnippetRowView(
+        let itemID = PanelListItem.snippetItemID(snippet.id, context: context)
+        return SnippetRowView(
             snippet: snippet,
             tags: viewModel.tags(for: snippet),
             titleHighlights: [],
             bodyHighlights: [],
             isTagColorShown: viewModel.preferences.isTagColorShown,
             isSelected: viewModel.isSnippetSelected(snippet.id, context: context),
-            indexHint: nil,
+            indexHint: viewModel.snippetOrdinalsByItemID[itemID],
             onToggleFavorite: { viewModel.toggleFavorite(snippet.id) }
         )
         .onTapGesture { viewModel.selectSnippet(snippet, context: context) }

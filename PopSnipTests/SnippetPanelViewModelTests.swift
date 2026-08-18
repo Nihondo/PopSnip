@@ -124,4 +124,53 @@ struct SnippetPanelViewModelTests {
         #expect(receivedWaitsForHighlight == false)
         #expect(viewModel.isConfirmingSelection == false)
     }
+
+    @Test("⌘1〜⌘9の番号は、トップレベル閲覧でもセクションをまたいで通し番号になる")
+    func snippetOrdinalsSpanSectionsInTopLevelBrowsing() {
+        let store = makeStore()
+        // allSnippets はタイトルの辞書順で並ぶため、順序を明確にするため意図的に
+        // "Apple" < "Banana" となるタイトルを使う。
+        var favorite = Snippet(title: "Apple", body: "本文")
+        favorite.isFavorite = true
+        let other = Snippet(title: "Banana", body: "本文")
+        store.upsertSnippet(favorite)
+        store.upsertSnippet(other)
+
+        let viewModel = makeViewModel(store: store)
+
+        let favoriteItemID = PanelListItem.snippetItemID(favorite.id, context: PanelSection.favorites.rawValue)
+        let otherItemID = PanelListItem.snippetItemID(other.id, context: PanelSection.allSnippets.rawValue)
+        let favoriteInAllItemID = PanelListItem.snippetItemID(favorite.id, context: PanelSection.allSnippets.rawValue)
+
+        let ordinals = viewModel.snippetOrdinalsByItemID
+        #expect(ordinals[favoriteItemID] == 1)
+        #expect(ordinals[favoriteInAllItemID] == 2)
+        #expect(ordinals[otherItemID] == 3)
+    }
+
+    @Test("番号キー選択が無効なときは番号を振らない")
+    func snippetOrdinalsAreEmptyWhenNumberKeySelectionDisabled() {
+        let store = makeStore()
+        store.upsertSnippet(Snippet(title: "テスト", body: "本文"))
+        var preferences = PanelPreferences.default
+        preferences.isNumberKeySelectionEnabled = false
+
+        let viewModel = makeViewModel(store: store, preferences: preferences)
+
+        #expect(viewModel.snippetOrdinalsByItemID.isEmpty)
+    }
+
+    @Test("10件目以降のスニペットには番号を振らない（⌘0〜⌘9の範囲外）")
+    func snippetOrdinalsCapAtNine() {
+        let store = makeStore()
+        let snippets = (1...10).map { Snippet(title: "スニペット\($0)", body: "本文") }
+        snippets.forEach(store.upsertSnippet)
+
+        let viewModel = makeViewModel(store: store)
+
+        let ordinals = viewModel.snippetOrdinalsByItemID
+        #expect(ordinals.count == 9)
+        let tenthItemID = PanelListItem.snippetItemID(snippets[9].id, context: PanelSection.allSnippets.rawValue)
+        #expect(ordinals[tenthItemID] == nil)
+    }
 }

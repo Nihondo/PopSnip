@@ -172,6 +172,29 @@ final class SnippetPanelViewModel: ObservableObject {
         }
     }
 
+    /// `listItems` 中のスニペット項目に、⌘1〜⌘9 に対応する1-based の番号を振る。
+    /// `selectSnippetByOrdinal(_:)` が数えるのと同じ順序（タグ・戻る行を除いた
+    /// スニペットだけの通し番号）を使うため、View 側はここを引くだけで
+    /// キー操作と表示が食い違わない。
+    var snippetOrdinalsByItemID: [String: Int] {
+        guard preferences.isNumberKeySelectionEnabled else {
+            return [:]
+        }
+        var result: [String: Int] = [:]
+        var ordinal = 0
+        for item in listItems {
+            guard case .snippet = item else {
+                continue
+            }
+            ordinal += 1
+            guard ordinal <= 9 else {
+                break
+            }
+            result[item.id] = ordinal
+        }
+        return result
+    }
+
     /// 検索中またはドリルダウン中に表示するスニペット項目。
     var scopedSnippetItems: [PanelListItem] {
         let context = isSearching ? "search" : "drilldown"

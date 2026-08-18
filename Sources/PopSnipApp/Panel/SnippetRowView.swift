@@ -4,6 +4,10 @@
 
 import SwiftUI
 
+/// ⌘1〜⌘9 バッジ用に確保する先頭列の幅。バッジが無い行もこの幅だけ空けることで、
+/// バッジの有無に関わらずタイトルの開始位置を揃える。
+private let indexBadgeColumnWidth: CGFloat = 18
+
 /// 選択中の行のハイライト。`.regularMaterial`（半透明のビビッド背景）の上では
 /// 低opacityの塗りだけだとブレンドでほぼ見えなくなるため、塗り + 縁取りの二重で強調する。
 private extension View {
@@ -34,12 +38,25 @@ struct SnippetRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            if let indexHint, (1...9).contains(indexHint) {
-                Text("\(indexHint)")
-                    .font(appFontSize.font(DesignTokens.Typography.indexHint, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-                    .frame(width: 14, alignment: .trailing)
-            }
+            // `if let` の条件分岐だと nil 側が EmptyView になり、Group越しの
+            // .frame(width:) がその分岐には効かず行ごとに幅がぶれるため、
+            // 常に同じ Text を描画して opacity だけで表示/非表示を切り替える。
+            Text(indexHint.map(String.init) ?? "0")
+                .font(appFontSize.font(DesignTokens.Typography.indexHint, weight: .semibold, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 2)
+                .padding(.vertical, 1)
+                .background(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small, style: .continuous)
+                        .fill(Color.primary.opacity(0.08))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small, style: .continuous)
+                        .strokeBorder(Color.primary.opacity(0.16), lineWidth: 1)
+                )
+                .opacity(indexHint == nil ? 0 : 1)
+                .frame(width: indexBadgeColumnWidth * appFontSize.scale, alignment: .leading)
+                .frame(maxHeight: .infinity, alignment: .center)
 
             VStack(alignment: .leading, spacing: 2) {
                 highlightedText(
